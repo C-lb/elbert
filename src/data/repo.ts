@@ -6,7 +6,7 @@ const stamp = <T extends object>(row: T) => ({ ...row, updatedAt: Date.now(), di
 export const repo = {
   async put(table: SyncedTable, row: any) { await (db as any)[table].put(stamp(row)) },
   async softDelete(table: Exclude<SyncedTable, 'reviews'>, id: string) {
-    if (table === 'reviews') throw new Error('softDelete forbidden on append-only reviews table')
+    if ((table as string) === 'reviews') throw new Error('softDelete forbidden on append-only reviews table')
     const row = await (db as any)[table].get(id)
     if (row) await (db as any)[table].put(stamp({ ...row, deletedAt: Date.now() }))
   },
