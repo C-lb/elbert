@@ -1,7 +1,7 @@
 // Integration tests against a real Postgres. Only run when PG_TEST_URL is
 // set (colima docker container, see task brief); plain `npm test` skips
 // this whole file and stays green.
-import { describe, it, expect, beforeAll, beforeEach } from 'vitest'
+import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { Client } from 'pg'
@@ -44,6 +44,51 @@ async function call(body: unknown, key?: string | null) {
   await handler(makeReq(body, key), res)
   return res
 }
+
+// Unconditional — no real DB needed. Reproduces the prod incident where
+// api/_lib/pg.ts's static `import { Pool } from 'pg'` made /api/sync
+// 500 (FUNCTION_INVOCATION_FAILED) on EVERY request, even wrong-key ones
+// that must 401 before ever touching a database, because DATABASE_URL
+// wasn't provisioned in Vercel yet. Fix: dynamic imports inside getDb(),
+// only invoked after assertKey() has already let the request through.
+describe('auth precedes database availability', () => {
+  const savedEnv = {
+    ELBERT_KEY: process.env.ELBERT_KEY,
+    DATABASE_URL: process.env.DATABASE_URL,
+    PG_TEST_URL: process.env.PG_TEST_URL,
+  }
+
+  beforeEach(() => {
+    resetDbCache()
+  })
+
+  afterEach(() => {
+    resetDbCache()
+    for (const [key, value] of Object.entries(savedEnv)) {
+      if (value === undefined) delete process.env[key]
+      else process.env[key] = value
+    }
+  })
+
+  it('401s on a wrong key with no DB env configured at all', async () => {
+    delete process.env.DATABASE_URL
+    delete process.env.PG_TEST_URL
+    process.env.ELBERT_KEY = 'lazy-test-key'
+
+    const res = await call({ push: [], cursor: 0 }, 'definitely-wrong-key')
+    expect(res.statusCode).toBe(401)
+  })
+
+  it('valid key with no DATABASE_URL/PG_TEST_URL returns a clean 500 JSON, not a crash', async () => {
+    delete process.env.DATABASE_URL
+    delete process.env.PG_TEST_URL
+    process.env.ELBERT_KEY = 'lazy-test-key'
+
+    const res = await call({ push: [], cursor: 0 }, 'lazy-test-key')
+    expect(res.statusCode).toBe(500)
+    expect(res.body).toEqual({ error: 'database not configured' })
+  })
+})
 
 describe.skipIf(!PG_TEST_URL)('POST /api/sync', () => {
   beforeAll(async () => {

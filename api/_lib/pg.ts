@@ -10,9 +10,17 @@
 // transaction, returning an array of row-arrays (one per query, in order).
 // This is exactly the shape neon's `sql.transaction()` returns, so the pg
 // path is written to match it.
-import { neon } from '@neondatabase/serverless'
-import { Pool } from 'pg'
-
+//
+// IMPORTANT: both driver packages are loaded via dynamic `import()` inside
+// getDb(), not as static top-level imports. A prod incident showed that
+// with static imports, `/api/sync` 500ed as FUNCTION_INVOCATION_FAILED for
+// EVERY request — including wrong-key ones that must 401 without ever
+// touching a database — before DATABASE_URL was provisioned in Vercel.
+// Static `import { Pool } from 'pg'` runs `pg`'s own top-level module code
+// as part of loading this function's bundle, which can fail independently
+// of whether any of our code actually calls it. Dynamic imports defer that
+// entirely until getDb() is actually invoked, which only happens after
+// assertKey() has already let the request through.
 export interface QueryDesc {
   text: string
   params: unknown[]
@@ -22,7 +30,15 @@ export interface DbClient {
   transaction(queries: QueryDesc[]): Promise<unknown[][]>
 }
 
-function makeNeonClient(url: string): DbClient {
+export class DatabaseNotConfiguredError extends Error {
+  statusCode = 500
+  constructor() {
+    super('database not configured')
+  }
+}
+
+async function makeNeonClient(url: string): Promise<DbClient> {
+  const { neon } = await import('@neondatabase/serverless')
   const sql = neon(url)
   return {
     async transaction(queries) {
@@ -32,7 +48,8 @@ function makeNeonClient(url: string): DbClient {
   }
 }
 
-function makePgClient(url: string): DbClient {
+async function makePgClient(url: string): Promise<DbClient> {
+  const { Pool } = await import('pg')
   const pool = new Pool({ connectionString: url })
   return {
     async transaction(queries) {
@@ -65,16 +82,19 @@ let cached: DbClient | undefined
  * is used, routed through neon-http unless the URL is clearly not a Neon
  * endpoint (e.g. a local/CI Postgres override), in which case `pg` is used
  * too.
+ *
+ * Throws DatabaseNotConfiguredError (not a raw crash) if neither env var is
+ * set — callers should catch this and return a clean JSON 500.
  */
-export function getDb(): DbClient {
+export async function getDb(): Promise<DbClient> {
   if (cached) return cached
   const testUrl = process.env.PG_TEST_URL
   const prodUrl = process.env.DATABASE_URL
   const url = testUrl ?? prodUrl
-  if (!url) throw new Error('DATABASE_URL (or PG_TEST_URL) is not set')
+  if (!url) throw new DatabaseNotConfiguredError()
 
   const useNodePg = !!testUrl || !/neon\.tech/.test(url)
-  cached = useNodePg ? makePgClient(url) : makeNeonClient(url)
+  cached = useNodePg ? await makePgClient(url) : await makeNeonClient(url)
   return cached
 }
 

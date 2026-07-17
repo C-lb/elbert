@@ -55,7 +55,7 @@
 // Table/column names below are a fixed whitelist — never interpolate a
 // client-supplied identifier into SQL.
 import { assertKey, UnauthorizedError } from './_lib/auth.ts'
-import { getDb, type QueryDesc } from './_lib/pg.ts'
+import { getDb, DatabaseNotConfiguredError, type QueryDesc } from './_lib/pg.ts'
 
 export const SYNCED_TABLES = ['decks', 'notes', 'cards', 'reviews', 'media'] as const
 export type SyncedTable = (typeof SYNCED_TABLES)[number]
@@ -237,7 +237,16 @@ export default async function handler(req: SyncRequest, res: SyncResponse): Prom
     params: [],
   }
 
-  const db = getDb()
+  let db
+  try {
+    db = await getDb()
+  } catch (err) {
+    if (err instanceof DatabaseNotConfiguredError) {
+      res.status(500).json({ error: 'database not configured' })
+      return
+    }
+    throw err
+  }
   const results = await db.transaction([lockQuery, ...upsertQueries, ...pullQueries, cursorQuery])
 
   const pullStart = 1 + upsertQueries.length
