@@ -4,7 +4,7 @@ import { parseCloze } from './cloze'
 
 const blank = (noteId: string, ord: number): Card => ({
   id: uuid(), noteId, ord, due: Date.now(), stability: 0, difficulty: 0,
-  reps: 0, lapses: 0, state: 0, lastReview: null, suspended: 0, deletedAt: null,
+  reps: 0, lapses: 0, state: 0, lastReview: null, suspended: 0, deletedAt: null, learningSteps: 0,
 })
 
 export function cardsForNote(note: Note): Card[] {

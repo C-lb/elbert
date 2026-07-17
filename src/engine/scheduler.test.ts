@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '@/data/db'
 import { applyReview, previewIntervals } from './scheduler'
 
-const newCard = (): any => ({ id: 'c1', noteId: 'n1', ord: 0, due: Date.now(), stability: 0, difficulty: 0, reps: 0, lapses: 0, state: 0, lastReview: null, suspended: 0, deletedAt: null })
+const newCard = (): any => ({ id: 'c1', noteId: 'n1', ord: 0, due: Date.now(), stability: 0, difficulty: 0, reps: 0, lapses: 0, state: 0, lastReview: null, suspended: 0, deletedAt: null, learningSteps: 0 })
 
 beforeEach(async () => { await Promise.all(db.tables.map(t => t.clear())) })
 
@@ -22,6 +22,12 @@ describe('scheduler', () => {
     c = await applyReview({ ...c }, 4, 1000, 0.9)
     const lapsed = await applyReview({ ...c }, 1, 1000, 0.9)
     expect(lapsed.lapses).toBeGreaterThanOrEqual(1)
+  })
+  it('a card given Good twice progresses through learning and graduates', async () => {
+    const first = await applyReview(newCard(), 3, 1000, 0.9)
+    expect(first.state).not.toBe(2) // still in Learning after one Good (default ladder has 2 steps)
+    const second = await applyReview({ ...first }, 3, 1000, 0.9)
+    expect(second.state).toBe(2) // graduated to Review after second Good
   })
   it('previewIntervals returns labels for all four ratings', () => {
     const p = previewIntervals(newCard(), 0.9)

@@ -12,7 +12,7 @@ function toFsrs(c: Card): FsrsCard {
     difficulty: c.difficulty,
     elapsed_days: 0,
     scheduled_days: 0,
-    learning_steps: 0,
+    learning_steps: c.learningSteps,
     reps: c.reps,
     lapses: c.lapses,
     state: c.state as State,
@@ -30,6 +30,7 @@ function fromFsrs(c: Card, f: FsrsCard): Card {
     lapses: f.lapses,
     state: f.state as Card['state'],
     lastReview: f.last_review ? f.last_review.getTime() : null,
+    learningSteps: f.learning_steps,
   }
 }
 
@@ -57,6 +58,7 @@ export async function applyReview(card: Card, rating: Rating, elapsedMs: number,
     reps: card.reps,
     lapses: card.lapses,
     state: card.state,
+    learningSteps: card.learningSteps,
   }
   const rec = engine(retention).repeat(toFsrs(card), new Date())
   const updated = fromFsrs(card, rec[rating as Grade].card)
