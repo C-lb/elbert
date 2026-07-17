@@ -11,10 +11,25 @@ interface QuickCaptureProps {
 }
 
 const INBOX_DECK_NAME = 'Inbox'
+const INBOX_DECK_ID_META_KEY = 'inboxDeckId'
 
+// Remembers the Inbox deck's id in meta once created, so a later rename doesn't orphan quick
+// captures into a second "Inbox" deck, and looks up by id first (falling back to a name match for
+// installs that captured before this meta key existed). Also guards a double-tap race: the second
+// call sees the meta key the first call just wrote and reuses that deck instead of creating another.
 async function findOrCreateInbox(): Promise<string> {
-  const existing = await db.decks.filter(d => d.name === INBOX_DECK_NAME && d.deletedAt == null).first()
-  if (existing) return existing.id
+  const rememberedId = await repo.getMeta<string>(INBOX_DECK_ID_META_KEY)
+  if (rememberedId) {
+    const remembered = await db.decks.get(rememberedId)
+    if (remembered && remembered.deletedAt == null) return remembered.id
+  }
+
+  const byName = await db.decks.filter(d => d.name === INBOX_DECK_NAME && d.deletedAt == null).first()
+  if (byName) {
+    await repo.setMeta(INBOX_DECK_ID_META_KEY, byName.id)
+    return byName.id
+  }
+
   const id = uuid()
   await repo.put('decks', {
     id,
@@ -24,6 +39,7 @@ async function findOrCreateInbox(): Promise<string> {
     desiredRetention: 0.9,
     deletedAt: null,
   })
+  await repo.setMeta(INBOX_DECK_ID_META_KEY, id)
   return id
 }
 

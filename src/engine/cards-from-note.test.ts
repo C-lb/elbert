@@ -103,4 +103,53 @@ describe('syncCardsWithNote', () => {
     const ord1 = after.find(c => c.ord === 1)!
     expect(ord1.deletedAt).not.toBeNull()
   })
+
+  it('resurrects a soft-deleted card at a reappearing ordinal with fresh FSRS state, same id', async () => {
+    const n = note('basic_reversed', 'hola')
+    await syncCardsWithNote(n)
+    const firstOrd1 = (await db.cards.where('noteId').equals('n1').toArray()).find(c => c.ord === 1)!
+
+    const toBasic = note('basic', 'hola')
+    toBasic.id = 'n1'
+    await syncCardsWithNote(toBasic) // ord 1 soft-deleted
+
+    // simulate the deleted card having old FSRS state before it comes back
+    const deletedOrd1 = (await db.cards.where('noteId').equals('n1').toArray()).find(c => c.ord === 1)!
+    await db.cards.put({ ...deletedOrd1, reps: 9, stability: 42, state: 2, dirty: 0 })
+
+    const backToReversed = note('basic_reversed', 'hola')
+    backToReversed.id = 'n1'
+    await syncCardsWithNote(backToReversed)
+
+    const after = await db.cards.where('noteId').equals('n1').toArray()
+    const live = after.filter(c => c.deletedAt == null)
+    expect(live.map(c => c.ord).sort()).toEqual([0, 1])
+    const resurrected = live.find(c => c.ord === 1)!
+    expect(resurrected.id).toBe(firstOrd1.id) // same id reused, not a new row
+    expect(resurrected.reps).toBe(0) // fresh FSRS state, not the stale progress
+    expect(resurrected.stability).toBe(0)
+    expect(resurrected.state).toBe(0)
+  })
+
+  it('round trip basic -> reversed -> basic -> reversed ends with exactly 2 card rows total, none duplicated', async () => {
+    const n = note('basic', 'hola')
+    await syncCardsWithNote(n)
+
+    const reversed1 = note('basic_reversed', 'hola')
+    reversed1.id = 'n1'
+    await syncCardsWithNote(reversed1)
+
+    const basic2 = note('basic', 'hola')
+    basic2.id = 'n1'
+    await syncCardsWithNote(basic2)
+
+    const reversed2 = note('basic_reversed', 'hola')
+    reversed2.id = 'n1'
+    await syncCardsWithNote(reversed2)
+
+    const after = await db.cards.where('noteId').equals('n1').toArray()
+    expect(after).toHaveLength(2) // no dead duplicate rows accumulated across the round trip
+    const live = after.filter(c => c.deletedAt == null)
+    expect(live.map(c => c.ord).sort()).toEqual([0, 1])
+  })
 })

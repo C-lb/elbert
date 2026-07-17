@@ -12,7 +12,6 @@
   --danger-soft: rgba(224, 104, 95, 0.14);
   --success: #6bbf8b;
   --success-soft: rgba(107, 191, 139, 0.14);
-  --info: #6fa8dc;
 
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
 
@@ -332,7 +331,7 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
   outline-offset: -2px;
 }
 .editor-delete-btn {
-  width: 40px; height: 40px; padding: 0;
+  width: 48px; height: 48px; padding: 0;
   display: flex; align-items: center; justify-content: center;
   background: transparent; border: 1px solid transparent; border-radius: 8px;
   color: var(--ink-3); cursor: pointer;
@@ -366,7 +365,7 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
 .sheet-header { display: flex; align-items: center; justify-content: space-between; }
 .sheet-title { color: var(--ink); font-size: 1.1em; font-weight: 600; }
 .sheet-close {
-  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;
   background: transparent; border: 1px solid transparent; border-radius: 8px;
   color: var(--ink-3); cursor: pointer;
 }

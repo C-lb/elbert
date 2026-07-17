@@ -92,6 +92,11 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
   const [dropTarget, setDropTarget] = useState<string | null>(null)
   const termRefs = useRef<Map<string, HTMLInputElement>>(new Map())
   const focusRowIdRef = useRef<string | null>(null)
+  // Mirrors `rows` synchronously so commitRow always reads the latest state, even from a
+  // same-tick caller (image drop) or a setTimeout callback (type change) that would otherwise
+  // see a stale `rows` from whatever render closure captured them.
+  const rowsRef = useRef<UIRow[]>([])
+  rowsRef.current = rows
 
   useEffect(() => {
     ;(async () => {
@@ -122,16 +127,22 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
     setRows(prev => prev.map(r => (r.id === id ? { ...r, ...patch } : r)))
   }
 
-  const commitRow = async (id: string) => {
-    const row = rows.find(r => r.id === id)
-    if (!row) return
-    if (!row.term.trim()) return // nothing to save yet
+  // Commits a row to the DB. `patch`, when given, is applied on top of the latest known row
+  // (rowsRef.current) before writing — this lets a caller that just changed something (image drop,
+  // type select) commit that exact value immediately, without waiting for a React re-render to land
+  // in rowsRef.current first (state updates aren't visible synchronously in the same tick).
+  const commitRow = async (id: string, patch?: Partial<UIRow>) => {
+    const base = rowsRef.current.find(r => r.id === id)
+    if (!base) return
+    const row = patch ? { ...base, ...patch } : base
+    if (!row.term.trim()) {
+      if (patch) updateRow(id, patch)
+      return // nothing to save yet
+    }
     const note = noteFromRow(deckId, row)
     await repo.put('notes', note)
     await syncCardsWithNote(note)
-    if (!row.persisted) {
-      setRows(prev => ensureTrailingBlank(prev.map(r => (r.id === id ? { ...r, persisted: true } : r))))
-    }
+    setRows(prev => ensureTrailingBlank(prev.map(r => (r.id === id ? { ...r, ...patch, persisted: true } : r))))
   }
 
   const deleteRow = async (row: UIRow) => {
@@ -204,10 +215,7 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
     const hash = await hashBlob(file)
     await repo.put('media', { id: hash, hash, blob: file, mime: file.type, deletedAt: null })
 
-    updateRow(row.id, { imageId: hash })
-    if (row.term.trim() || row.persisted) {
-      await commitRow(row.id)
-    }
+    await commitRow(row.id, { imageId: hash })
   }
 
   if (!deck) {
@@ -303,11 +311,8 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
                     value={row.type}
                     onChange={e => {
                       const type = e.target.value as NoteType
-                      updateRow(row.id, { type })
-                      if (row.persisted || row.term.trim()) {
-                        // commit with the new type once state has flushed
-                        setTimeout(() => commitRow(row.id), 0)
-                      }
+                      if (row.persisted || row.term.trim()) commitRow(row.id, { type })
+                      else updateRow(row.id, { type })
                     }}
                   >
                     {(Object.keys(TYPE_LABELS) as NoteType[]).map(t => (

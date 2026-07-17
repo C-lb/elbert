@@ -21,9 +21,17 @@ function wantedOrdinals(note: Note): number[] {
   return parseCloze(note.fields.term).map(c => c.ord)
 }
 
+// Resurrects a previously soft-deleted card at the same id/ordinal, but with fresh FSRS state:
+// the card left the schedule while deleted, so its old progress is no longer meaningful. Reusing
+// the id (rather than minting a new one) keeps a round trip like basic -> reversed -> basic ->
+// reversed from accumulating dead duplicate rows for the same ordinal.
+const resurrect = (card: Card): Card => ({ ...blank(card.noteId, card.ord), id: card.id })
+
 /**
  * Reconcile the cards table with a note's current content after an edit.
- * - Missing ordinals (new cloze ordinal, or basic->basic_reversed) get new blank cards.
+ * - Missing ordinals (new cloze ordinal, or basic->basic_reversed) get a new blank card, unless a
+ *   soft-deleted card already exists for that ordinal, in which case it's resurrected (fresh FSRS
+ *   state, same id) instead of minting a duplicate.
  * - Ordinals no longer present (removed cloze ordinal, or basic_reversed->basic) get soft-deleted.
  * - Existing live cards for ordinals still present are left untouched (FSRS state preserved).
  * - A brand-new note with no cards yet gets the full set via cardsForNote.
@@ -38,12 +46,16 @@ export async function syncCardsWithNote(note: Note): Promise<void> {
   }
 
   const liveByOrd = new Map<number, Card>()
+  const deletedByOrd = new Map<number, Card>()
   for (const card of existing) {
     if (card.deletedAt == null) liveByOrd.set(card.ord, card)
+    else if (!deletedByOrd.has(card.ord)) deletedByOrd.set(card.ord, card)
   }
 
   for (const ord of wanted) {
-    if (!liveByOrd.has(ord)) await repo.put('cards', blank(note.id, ord))
+    if (liveByOrd.has(ord)) continue
+    const dead = deletedByOrd.get(ord)
+    await repo.put('cards', dead ? resurrect(dead) : blank(note.id, ord))
   }
 
   for (const [ord, card] of liveByOrd) {
