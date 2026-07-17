@@ -42,6 +42,7 @@ export default function Match({ deckId }: MatchProps) {
   const [misses, setMisses] = useState(0)
   const [finalMs, setFinalMs] = useState<number | null>(null)
   const [best, setBest] = useState<number | null>(null)
+  const [beatBest, setBeatBest] = useState(false)
 
   const gameRef = useRef<MatchGame | null>(null)
   const startedAtRef = useRef<number | null>(null)
@@ -72,6 +73,7 @@ export default function Match({ deckId }: MatchProps) {
     setFadingIds([])
     setMisses(0)
     setFinalMs(null)
+    setBeatBest(false)
     startedAtRef.current = null
     setPhase('playing')
   }, [notes, seed])
@@ -87,9 +89,11 @@ export default function Match({ deckId }: MatchProps) {
     const total = elapsed + missCount * PENALTY_MS
     setFinalMs(total)
     setPhase('done')
-    if (deckId && (best == null || total < best)) {
+    const isNewBest = deckId != null && (best == null || total < best)
+    setBeatBest(isNewBest)
+    if (isNewBest) {
       setBest(total)
-      void repo.setMeta(bestKey(deckId), total)
+      void repo.setMeta(bestKey(deckId!), total)
     }
   }
 
@@ -152,7 +156,6 @@ export default function Match({ deckId }: MatchProps) {
   }
 
   if (phase === 'done' && finalMs != null) {
-    const beatBest = deckId != null && best === finalMs
     return (
       <div className="screen">
         <div className="study-done">

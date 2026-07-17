@@ -40,12 +40,13 @@ export interface Draft {
 
 const MODEL = 'claude-sonnet-5'
 const MAX_TOKENS = 16000
-// 10MB cap on the base64 payload length, plus a hard cap on the actual
-// decoded byte size (~14MB, base64 inflates by ~4/3) so unusual padding
-// can't slip a bigger file past the length check. Keeps the overall request
-// comfortably under Anthropic's ~32MB request limit.
-const MAX_PDF_BASE64_LENGTH = 10 * 1024 * 1024
-const MAX_PDF_DECODED_BYTES = 14 * 1024 * 1024
+// The binding cap is 10MB of decoded PDF bytes, matching the client's file
+// size check. The base64 length pre-check is that cap inflated by ~4/3
+// (base64 grows relative to raw bytes) so oversized payloads are rejected
+// cheaply before any decode math. Keeps the overall request comfortably
+// under Anthropic's ~32MB request limit.
+const MAX_PDF_DECODED_BYTES = 10 * 1024 * 1024
+const MAX_PDF_BASE64_LENGTH = 14 * 1024 * 1024
 
 // Anki cloze syntax: {{c1::answer}}, optionally {{c1::answer::hint}}.
 const CLOZE_MARKER_RE = /\{\{c\d+::.*?\}\}/
@@ -122,10 +123,10 @@ function validateBody(body: GenerateRequestBody): ValidatedInput {
     throw new ValidationError('count must be an integer between 1 and 50')
   }
   if (pdfBase64 && pdfBase64.length > MAX_PDF_BASE64_LENGTH) {
-    throw new ValidationError('pdfBase64 exceeds the 10MB cap')
+    throw new ValidationError('pdf exceeds the 10MB cap')
   }
   if (pdfBase64 && base64ByteLength(pdfBase64) > MAX_PDF_DECODED_BYTES) {
-    throw new ValidationError('pdfBase64 exceeds the 10MB cap')
+    throw new ValidationError('pdf exceeds the 10MB cap')
   }
 
   return { text, pdfBase64, style: body.style as Style, count }

@@ -103,11 +103,20 @@ describe('POST /api/generate', () => {
     expect((res.body as { error: string }).error).toMatch(/count/i)
   })
 
-  it('400s when pdfBase64 exceeds the 10MB cap', async () => {
-    const big = 'A'.repeat(10 * 1024 * 1024 + 1)
+  it('400s when the decoded pdf exceeds the 10MB cap', async () => {
+    // 14MB of base64 decodes to ~10.5MB, just over the 10MB decoded cap.
+    const big = 'A'.repeat(14 * 1024 * 1024)
     const res = await call({ pdfBase64: big, style: 'basic' })
     expect(res.statusCode).toBe(400)
     expect((res.body as { error: string }).error).toMatch(/large|size|cap|mb/i)
+  })
+
+  it('accepts a pdf the size the client allows (10MB file)', async () => {
+    // A 10MB file becomes ~13.3MB of base64; must pass validation.
+    mockDrafts()
+    const clientMax = 'A'.repeat(4 * Math.floor((10 * 1024 * 1024) / 3))
+    const res = await call({ pdfBase64: clientMax, style: 'basic' })
+    expect(res.statusCode).toBe(200)
   })
 
   it('500s cleanly when ANTHROPIC_API_KEY is not configured', async () => {

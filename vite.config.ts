@@ -1,4 +1,4 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig, configDefaults } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
@@ -16,5 +16,5 @@ export default defineConfig({
     }),
   ],
   resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
-  test: { environment: 'node', exclude: ['e2e/**', 'node_modules/**'] },
+  test: { environment: 'node', exclude: [...configDefaults.exclude, 'e2e/**'] },
 })
