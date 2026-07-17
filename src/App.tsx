@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Nav from '@/components/Nav'
 import Home from '@/screens/Home'
 import Settings from '@/screens/Settings'
+import Study from '@/screens/Study'
 
 interface Route {
   name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'generate' | 'settings'
@@ -85,7 +86,7 @@ function App() {
       case 'settings':
         return <Settings />
       case 'study':
-        return <NotBuilt label="Study" />
+        return <Study deckId={route.deckId} />
       case 'learn':
         return <NotBuilt label="Learn mode" />
       case 'test':
