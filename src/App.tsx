@@ -4,6 +4,7 @@ import Home from '@/screens/Home'
 import Settings from '@/screens/Settings'
 import Study from '@/screens/Study'
 import Learn from '@/screens/Learn'
+import TestMode from '@/screens/TestMode'
 import Editor from '@/screens/Editor'
 import DeckSettings from '@/screens/DeckSettings'
 import { requestSync, useSyncStatus } from '@/sync/status'
@@ -100,7 +101,7 @@ function App() {
       case 'learn':
         return <Learn deckId={route.deckId} />
       case 'test':
-        return <NotBuilt label="Test mode" />
+        return <TestMode deckId={route.deckId} />
       case 'match':
         return <NotBuilt label="Match mode" />
       case 'edit':
