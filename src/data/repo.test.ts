@@ -23,6 +23,12 @@ describe('repo', () => {
     expect(await db.reviews.count()).toBe(1)
     expect((repo as any).updateReview).toBeUndefined()
   })
+  it('softDelete forbids reviews (append-only)', async () => {
+    await repo.addReview({ id: 'r1', cardId: 'c1', ts: 1, rating: 3, elapsedMs: 900, snapshot: {}, deletedAt: null })
+    await expect(repo.softDelete('reviews' as any, 'r1')).rejects.toThrow('forbid')
+    const row = await db.reviews.get('r1')
+    expect(row!.deletedAt).toBeNull()
+  })
   it('dirtyRows / clearDirty round-trip', async () => {
     await repo.put('decks', { id: 'd1', name: 'x', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null })
     const dirty = await repo.dirtyRows()
