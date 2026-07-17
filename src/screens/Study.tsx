@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { db } from '@/data/db'
 import { buildQueue, noteNewIntroduced } from '@/engine/queue'
 import { applyReview, previewIntervals } from '@/engine/scheduler'
@@ -19,9 +19,23 @@ export default function Study({ deckId }: StudyProps) {
   const [retentionByDeck, setRetentionByDeck] = useState<Map<string, number>>(new Map())
   const [card, setCard] = useState<Card | null>(null)
   const [reviewed, setReviewed] = useState(0)
+  const [submitting, setSubmitting] = useState(false)
   const sessionRef = useRef<Session | null>(null)
   const revealAtRef = useRef(0)
-  const newIntroducedRef = useRef<Map<string, number>>(new Map())
+  const submittingRef = useRef(false)
+  const countedNewRef = useRef<Set<string>>(new Set())
+  const notesByIdRef = useRef<Map<string, Note>>(new Map())
+
+  // Counts a state-0 card as "introduced" the moment it is first shown, exactly once,
+  // even if it re-queues intraday. Fired synchronously with display so an interrupted
+  // session still advances the daily cap (no batching at session end).
+  const noteShown = useCallback((c: Card | null) => {
+    if (!c || c.state !== 0 || countedNewRef.current.has(c.id)) return
+    const note = notesByIdRef.current.get(c.noteId)
+    if (!note) return
+    countedNewRef.current.add(c.id)
+    void noteNewIntroduced(note.deckId, 1)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -32,55 +46,58 @@ export default function Study({ deckId }: StudyProps) {
       const decks = await db.decks.toArray()
       if (cancelled) return
 
-      setNotesById(new Map(notes.map(n => [n.id, n])))
+      const notesMap = new Map(notes.map(n => [n.id, n]))
+      notesByIdRef.current = notesMap
+      setNotesById(notesMap)
       setRetentionByDeck(new Map(decks.map(d => [d.id, d.desiredRetention])))
-
-      for (const c of queue) {
-        if (c.state === 0) {
-          const note = notes.find(n => n.id === c.noteId)
-          if (note) newIntroducedRef.current.set(note.deckId, (newIntroducedRef.current.get(note.deckId) ?? 0) + 1)
-        }
-      }
 
       const session = createSession(queue)
       sessionRef.current = session
       const first = session.current()
       setCard(first)
       setPhase(first ? 'front' : 'done')
+      noteShown(first)
     })()
 
     return () => {
       cancelled = true
     }
-  }, [deckId])
+  }, [deckId, noteShown])
 
-  async function finish() {
-    for (const [id, n] of newIntroducedRef.current) await noteNewIntroduced(id, n)
-    setPhase('done')
-  }
-
-  function reveal() {
+  const reveal = useCallback(() => {
     if (phase !== 'front') return
     revealAtRef.current = Date.now()
     setPhase('back')
-  }
+  }, [phase])
 
-  async function rate(rating: Rating) {
-    const session = sessionRef.current
-    if (!session || !card) return
-    const note = notesById.get(card.noteId)
-    const retention = (note && retentionByDeck.get(note.deckId)) ?? 0.9
-    const elapsedMs = Date.now() - revealAtRef.current
+  const rate = useCallback(
+    async (rating: Rating) => {
+      if (submittingRef.current) return
+      submittingRef.current = true
+      setSubmitting(true)
 
-    const updated = await applyReview(card, rating, elapsedMs, retention)
-    session.answer(updated)
-    setReviewed(n => n + 1)
+      try {
+        const session = sessionRef.current
+        if (!session || !card) return
+        const note = notesById.get(card.noteId)
+        const retention = (note && retentionByDeck.get(note.deckId)) ?? 0.9
+        const elapsedMs = Date.now() - revealAtRef.current
 
-    const next = session.current()
-    setCard(next)
-    setPhase(next ? 'front' : 'done')
-    if (!next) await finish()
-  }
+        const updated = await applyReview(card, rating, elapsedMs, retention)
+        session.answer(updated)
+        setReviewed(n => n + 1)
+
+        const next = session.current()
+        setCard(next)
+        setPhase(next ? 'front' : 'done')
+        noteShown(next)
+      } finally {
+        submittingRef.current = false
+        setSubmitting(false)
+      }
+    },
+    [card, notesById, retentionByDeck, noteShown]
+  )
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -93,7 +110,14 @@ export default function Study({ deckId }: StudyProps) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  })
+  }, [phase, reveal, rate])
+
+  const note = card ? notesById.get(card.noteId) : undefined
+  const retention = note ? retentionByDeck.get(note.deckId) ?? 0.9 : 0.9
+  const labels = useMemo(
+    () => (card ? previewIntervals(card, retention) : null),
+    [card, retention]
+  )
 
   if (phase === 'loading') {
     return (
@@ -115,16 +139,13 @@ export default function Study({ deckId }: StudyProps) {
     )
   }
 
-  const note = card ? notesById.get(card.noteId) : undefined
-  if (!card || !note) {
+  if (!card || !note || !labels) {
     return (
       <div className="screen">
         <div className="stub">Nothing to study.</div>
       </div>
     )
   }
-
-  const labels = previewIntervals(card, retentionByDeck.get(note.deckId) ?? 0.9)
 
   return (
     <div className="screen study-screen">
@@ -137,7 +158,7 @@ export default function Study({ deckId }: StudyProps) {
           Show answer
         </button>
       )}
-      {phase === 'back' && <RatingBar labels={labels} onRate={rate} />}
+      {phase === 'back' && <RatingBar labels={labels} onRate={rate} disabled={submitting} />}
     </div>
   )
 }

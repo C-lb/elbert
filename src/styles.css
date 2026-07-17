@@ -251,6 +251,8 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
 .rating-btn:hover { background: var(--surface-2); }
 .rating-btn:active { opacity: 0.85; }
 .rating-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rating-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+.rating-btn:disabled:hover { background: var(--surface-1); }
 .rating-text { font-weight: 600; }
 .rating-interval { font-size: 0.85em; color: var(--ink-3); }
 .rating-again { color: var(--danger); }
