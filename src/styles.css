@@ -59,7 +59,14 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
   padding: var(--s4);
   border-bottom: 1px solid var(--stroke);
 }
-.nav-title { font-size: 1.15em; flex: 1; text-align: center; }
+.nav-title { font-size: 1.15em; flex: 1; text-align: center; display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); }
+.nav-sync-badge {
+  font-size: 0.6em; line-height: 1; font-weight: 600;
+  min-width: 1.6em; height: 1.6em; padding: 0 0.4em;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 999px;
+  background: var(--surface-2); color: var(--ink-2);
+}
 .nav-side { width: 48px; display: flex; }
 .nav-side-end { justify-content: flex-end; }
 .nav-icon-btn {

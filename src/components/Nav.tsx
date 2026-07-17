@@ -2,6 +2,7 @@ interface NavProps {
   title: string
   onBack?: () => void
   onSettings?: () => void
+  pendingSync?: number
 }
 
 function GearIcon() {
@@ -21,7 +22,7 @@ function BackIcon() {
   )
 }
 
-export default function Nav({ title, onBack, onSettings }: NavProps) {
+export default function Nav({ title, onBack, onSettings, pendingSync }: NavProps) {
   return (
     <header className="nav">
       <div className="nav-side">
@@ -31,7 +32,14 @@ export default function Nav({ title, onBack, onSettings }: NavProps) {
           </button>
         )}
       </div>
-      <h1 className="nav-title">{title}</h1>
+      <h1 className="nav-title">
+        {title}
+        {!!pendingSync && (
+          <span className="nav-sync-badge" title={`${pendingSync} change${pendingSync === 1 ? '' : 's'} waiting to sync`}>
+            {pendingSync}
+          </span>
+        )}
+      </h1>
       <div className="nav-side nav-side-end">
         {onSettings && (
           <button className="nav-icon-btn" onClick={onSettings} aria-label="Settings">

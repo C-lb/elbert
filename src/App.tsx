@@ -3,6 +3,7 @@ import Nav from '@/components/Nav'
 import Home from '@/screens/Home'
 import Settings from '@/screens/Settings'
 import Study from '@/screens/Study'
+import { requestSync, useSyncStatus } from '@/sync/status'
 
 interface Route {
   name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'generate' | 'settings'
@@ -72,6 +73,13 @@ const TITLES: Record<Route['name'], string> = {
 
 function App() {
   const route = useRoute()
+  const { pending } = useSyncStatus()
+
+  useEffect(() => {
+    requestSync()
+    window.addEventListener('online', requestSync)
+    return () => window.removeEventListener('online', requestSync)
+  }, [])
 
   const body = (() => {
     switch (route.name) {
@@ -106,6 +114,7 @@ function App() {
         title={TITLES[route.name]}
         onBack={route.name === 'home' ? undefined : () => navigate('#/')}
         onSettings={route.name === 'home' ? () => navigate('#/settings') : undefined}
+        pendingSync={pending}
       />
       {body}
     </div>

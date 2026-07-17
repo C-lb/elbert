@@ -6,6 +6,7 @@ import { createSession, type Session } from '@/engine/session'
 import type { Card, Note, Rating } from '@/data/types'
 import CardFace from '@/components/CardFace'
 import RatingBar from '@/components/RatingBar'
+import { requestSync } from '@/sync/status'
 
 interface StudyProps {
   deckId?: string
@@ -91,6 +92,7 @@ export default function Study({ deckId }: StudyProps) {
         setCard(next)
         setPhase(next ? 'front' : 'done')
         noteShown(next)
+        if (!next) requestSync()
       } finally {
         submittingRef.current = false
         setSubmitting(false)
