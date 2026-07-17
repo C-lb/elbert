@@ -1,4 +1,5 @@
 import type { NoteType } from '@/data/types'
+import { isUnmarkedCloze } from '@/engine/draft'
 
 export interface DraftRow {
   id: string
@@ -28,34 +29,40 @@ export default function DraftList({ drafts, onChange }: DraftListProps) {
 
   return (
     <div className="draft-list">
-      {drafts.map(d => (
-        <div className={`draft-row${d.checked ? '' : ' draft-row-off'}`} key={d.id}>
-          <div className="draft-row-head">
-            <label className="draft-checkbox">
-              <input
-                type="checkbox"
-                checked={d.checked}
-                onChange={e => patch(d.id, { checked: e.target.checked })}
-              />
-            </label>
-            <span className="draft-badge">{TYPE_LABELS[d.type]}</span>
+      {drafts.map(d => {
+        const unmarked = isUnmarkedCloze(d)
+        return (
+          <div className={`draft-row${d.checked ? '' : ' draft-row-off'}`} key={d.id}>
+            <div className="draft-row-head">
+              <label className="draft-checkbox">
+                <input
+                  type="checkbox"
+                  checked={d.checked}
+                  onChange={e => patch(d.id, { checked: e.target.checked })}
+                />
+              </label>
+              <span className="draft-badge">{TYPE_LABELS[d.type]}</span>
+            </div>
+            <input
+              className="field draft-field"
+              value={d.term}
+              onChange={e => patch(d.id, { term: e.target.value })}
+              placeholder="Term"
+              aria-label="Term"
+            />
+            <input
+              className="field draft-field"
+              value={d.definition}
+              onChange={e => patch(d.id, { definition: e.target.value })}
+              placeholder="Definition"
+              aria-label="Definition"
+            />
+            {unmarked && (
+              <div className="draft-warning">no {'{{c1::...}}'} blank marked, this card will be skipped</div>
+            )}
           </div>
-          <input
-            className="field draft-field"
-            value={d.term}
-            onChange={e => patch(d.id, { term: e.target.value })}
-            placeholder="Term"
-            aria-label="Term"
-          />
-          <input
-            className="field draft-field"
-            value={d.definition}
-            onChange={e => patch(d.id, { definition: e.target.value })}
-            placeholder="Definition"
-            aria-label="Definition"
-          />
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

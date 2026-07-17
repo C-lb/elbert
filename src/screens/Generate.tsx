@@ -5,6 +5,7 @@ import { repo } from '@/data/repo'
 import { getSettings } from '@/lib/settings'
 import { cardsForNote } from '@/engine/cards-from-note'
 import DraftList, { type DraftRow } from '@/screens/DraftList'
+import { isUnmarkedCloze } from '@/engine/draft'
 import type { Deck, Note, NoteType } from '@/data/types'
 
 type Mode = 'text' | 'pdf'
@@ -128,8 +129,15 @@ export default function Generate() {
   }
 
   const approve = async () => {
-    const selected = rows?.filter(r => r.checked) ?? []
-    if (selected.length === 0 || approving) return
+    const checked = rows?.filter(r => r.checked) ?? []
+    if (checked.length === 0 || approving) return
+    // A cloze row with no {{c1::...}} marker would approve into a note with
+    // zero cards (cardsForNote finds no ordinals to build). Skip those
+    // instead of silently creating a dead note; DraftList already flags
+    // them inline so this isn't a surprise by the time approve runs.
+    const skipped = checked.filter(isUnmarkedCloze)
+    const selected = checked.filter(r => !isUnmarkedCloze(r))
+    if (selected.length === 0) return
     setApproving(true)
     try {
       const deckId = await resolveDeckId()
@@ -142,7 +150,9 @@ export default function Generate() {
         await repo.put('notes', note)
         for (const card of cardsForNote(note)) await repo.put('cards', card)
       }
-      setToast(`Approved ${selected.length} card${selected.length === 1 ? '' : 's'}`)
+      const approvedMsg = `Approved ${selected.length} card${selected.length === 1 ? '' : 's'}`
+      const skippedMsg = skipped.length > 0 ? `, skipped ${skipped.length} cloze with no blanks` : ''
+      setToast(approvedMsg + skippedMsg)
       setRows(null)
       setText('')
       setPdfBase64(null)
@@ -154,6 +164,8 @@ export default function Generate() {
   }
 
   const checkedCount = rows?.filter(r => r.checked).length ?? 0
+  const checkedSkippedCount = rows?.filter(r => r.checked && isUnmarkedCloze(r)).length ?? 0
+  const checkedApprovableCount = checkedCount - checkedSkippedCount
 
   return (
     <div className="screen">
@@ -301,7 +313,7 @@ export default function Generate() {
             <button
               className="btn btn-accent btn-block"
               onClick={approve}
-              disabled={checkedCount === 0 || approving || (!targetDeckId && !newDeckName.trim())}
+              disabled={checkedApprovableCount === 0 || approving || (!targetDeckId && !newDeckName.trim())}
             >
               {approving ? (
                 <span className="btn-loading">
@@ -309,7 +321,7 @@ export default function Generate() {
                   Approving…
                 </span>
               ) : (
-                `Approve ${checkedCount} card${checkedCount === 1 ? '' : 's'}`
+                `Approve ${checkedApprovableCount} card${checkedApprovableCount === 1 ? '' : 's'}`
               )}
             </button>
           </div>

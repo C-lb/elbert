@@ -1,4 +1,4 @@
-// POST /api/generate — AI card generation from notes text and/or a PDF, via
+// POST /api/generate: AI card generation from notes text and/or a PDF, via
 // the Claude API (`@anthropic-ai/sdk`, model claude-sonnet-5).
 //
 // Auth: header `x-elbert-key` must strictly equal env ELBERT_KEY (assertKey(),
@@ -15,11 +15,12 @@
 // the original brief): `output_config: { format: { type: 'json_schema',
 // schema: DRAFTS_SCHEMA }, effort: 'medium' }` on `messages.create`. The SDK
 // guarantees the response text block is schema-valid JSON, so parsing is a
-// plain JSON.parse — no manual validation of the model's output shape.
+// plain JSON.parse, no manual validation of the model's output shape (aside
+// from the cloze-marker filter below, which the schema can't express).
 //
 // The Anthropic client is constructed lazily *inside* the handler (never at
 // module load) so importing this file with no ANTHROPIC_API_KEY set never
-// throws — mirroring the api/_lib/pg.ts lazy-getDb() pattern that fixed the
+// throws: mirrors the api/_lib/pg.ts lazy-getDb() pattern that fixed the
 // prod incident where a static top-level import 500'd every request,
 // including ones that should 401 before ever touching an external service.
 import Anthropic, { APIError, RateLimitError } from '@anthropic-ai/sdk'
@@ -39,9 +40,15 @@ export interface Draft {
 
 const MODEL = 'claude-sonnet-5'
 const MAX_TOKENS = 16000
-// 10MB cap on the base64 PAYLOAD (not decoded bytes) — keeps the overall
-// request comfortably under Anthropic's ~32MB request limit.
+// 10MB cap on the base64 payload length, plus a hard cap on the actual
+// decoded byte size (~14MB, base64 inflates by ~4/3) so unusual padding
+// can't slip a bigger file past the length check. Keeps the overall request
+// comfortably under Anthropic's ~32MB request limit.
 const MAX_PDF_BASE64_LENGTH = 10 * 1024 * 1024
+const MAX_PDF_DECODED_BYTES = 14 * 1024 * 1024
+
+// Anki cloze syntax: {{c1::answer}}, optionally {{c1::answer::hint}}.
+const CLOZE_MARKER_RE = /\{\{c\d+::.*?\}\}/
 
 const STYLES = ['basic', 'basic_reversed', 'cloze', 'mix'] as const
 type Style = (typeof STYLES)[number]
@@ -50,7 +57,7 @@ function isStyle(value: unknown): value is Style {
   return typeof value === 'string' && (STYLES as readonly string[]).includes(value)
 }
 
-// No minLength/maxLength/minItems/maxItems — unsupported by structured
+// No minLength/maxLength/minItems/maxItems, unsupported by structured
 // outputs. Every object carries additionalProperties: false + required.
 const DRAFTS_SCHEMA = {
   type: 'object',
@@ -86,10 +93,6 @@ export class ValidationError extends Error {
   statusCode = 400
 }
 
-export class ConfigError extends Error {
-  statusCode = 500
-}
-
 interface GenerateRequestBody {
   text?: string
   pdfBase64?: string
@@ -121,6 +124,9 @@ function validateBody(body: GenerateRequestBody): ValidatedInput {
   if (pdfBase64 && pdfBase64.length > MAX_PDF_BASE64_LENGTH) {
     throw new ValidationError('pdfBase64 exceeds the 10MB cap')
   }
+  if (pdfBase64 && base64ByteLength(pdfBase64) > MAX_PDF_DECODED_BYTES) {
+    throw new ValidationError('pdfBase64 exceeds the 10MB cap')
+  }
 
   return { text, pdfBase64, style: body.style as Style, count }
 }
@@ -128,17 +134,17 @@ function validateBody(body: GenerateRequestBody): ValidatedInput {
 function buildSystemPrompt(style: Style, count: number): string {
   const styleInstruction =
     style === 'mix'
-      ? 'Choose whichever card type (basic, basic_reversed, or cloze) best suits each fact — use your judgement.'
+      ? 'Choose whichever card type (basic, basic_reversed, or cloze) best suits each fact, use your judgement.'
       : `Every card must use the "${style}" type.`
   return [
     'You are a spaced-repetition card author. Turn the source material into atomic flashcards:',
     '- One fact or concept per card. Prefer many small cards over few dense ones.',
     '- "basic" cards: term is the prompt, definition is the answer.',
-    '- "basic_reversed" cards: only when term and definition are genuinely symmetric (e.g. vocabulary pairs) — the card will be tested in both directions.',
-    '- "cloze" cards: put the full sentence in the term field, with the blanked span marked using Anki cloze syntax, e.g. "The capital of France is {{c1::Paris}}." Leave definition empty unless useful extra context belongs there.',
+    '- "basic_reversed" cards: only when term and definition are genuinely symmetric (e.g. vocabulary pairs), the card will be tested in both directions.',
+    '- "cloze" cards: put the full sentence in the term field, with the blanked span marked using Anki cloze syntax, e.g. "The capital of France is {{c1::Paris}}." A cloze card MUST contain at least one {{c1::...}} marker in the term field, or it will be discarded. Leave definition empty unless useful extra context belongs there.',
     '- "example" is an optional usage example or context sentence; "hint" is an optional nudge, not the answer.',
     styleInstruction,
-    `Aim for about ${count} cards — fewer is fine if the material doesn't support that many; do not pad with redundant or trivial cards.`,
+    `Aim for about ${count} cards, fewer is fine if the material doesn't support that many; do not pad with redundant or trivial cards.`,
   ].join('\n')
 }
 
@@ -147,7 +153,10 @@ function base64ByteLength(b64: string): number {
   return Math.floor((clean.length * 3) / 4)
 }
 
-export class RequestValidationError extends ValidationError {}
+/** Drops cloze drafts with no {{c1::...}} marker: they'd approve into a note with zero cards. */
+function filterUnmarkedCloze(drafts: Draft[]): Draft[] {
+  return drafts.filter(d => d.type !== 'cloze' || CLOZE_MARKER_RE.test(d.fields.term))
+}
 
 export interface GenerateRequest {
   method?: string
@@ -208,10 +217,6 @@ export default async function handler(req: GenerateRequest, res: GenerateRespons
 
   const content: Anthropic.Messages.ContentBlockParam[] = []
   if (input.pdfBase64) {
-    // Sanity guard against absurd base64 payloads slipping past the length
-    // cap due to unusual padding — belt-and-braces, the length check above
-    // already rejects the overwhelming majority of oversized requests.
-    void base64ByteLength(input.pdfBase64)
     content.push({
       type: 'document',
       source: { type: 'base64', media_type: 'application/pdf', data: input.pdfBase64 },
@@ -272,5 +277,5 @@ export default async function handler(req: GenerateRequest, res: GenerateRespons
     return
   }
 
-  res.status(200).json({ drafts })
+  res.status(200).json({ drafts: filterUnmarkedCloze(drafts) })
 }

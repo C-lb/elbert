@@ -140,6 +140,24 @@ describe('POST /api/generate', () => {
     expect(call1.temperature).toBeUndefined()
   })
 
+  it('drops cloze drafts with no {{c1::...}} marker so a note is never created with zero cards', async () => {
+    mockDrafts({
+      drafts: [
+        { type: 'basic', fields: { term: 'chat', definition: 'cat' } },
+        { type: 'cloze', fields: { term: 'The capital of France is Paris.', definition: '' } },
+        { type: 'cloze', fields: { term: 'The {{c1::cat}} sat.', definition: '' } },
+      ],
+    })
+    const res = await call({ text: 'notes', style: 'mix' })
+    expect(res.statusCode).toBe(200)
+    expect(res.body).toEqual({
+      drafts: [
+        { type: 'basic', fields: { term: 'chat', definition: 'cat' } },
+        { type: 'cloze', fields: { term: 'The {{c1::cat}} sat.', definition: '' } },
+      ],
+    })
+  })
+
   it('puts a PDF document block before the text block when pdfBase64 is given', async () => {
     mockDrafts()
     await call({ pdfBase64: Buffer.from('%PDF-1.4').toString('base64'), text: 'extra notes', style: 'basic' })

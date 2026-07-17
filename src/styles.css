@@ -605,5 +605,12 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
   padding: var(--s1) var(--s3);
 }
 .draft-field { min-height: 44px; }
+.draft-warning {
+  color: var(--danger);
+  background: var(--danger-soft);
+  border-radius: 8px;
+  padding: var(--s2) var(--s3);
+  font-size: 0.9em;
+}
 .draft-actions { display: flex; gap: var(--s2); align-items: stretch; }
 .draft-actions .btn-block { flex: 1; }
