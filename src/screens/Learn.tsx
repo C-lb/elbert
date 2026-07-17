@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '@/data/db'
 import { applyReview } from '@/engine/scheduler'
-import { clozeAnswer } from '@/engine/cloze'
-import { createLearnSession, type LearnSession, type LearnStep } from '@/engine/learn'
-import type { Note, Card } from '@/data/types'
+import { createLearnSession, answerForNote, type LearnSession, type LearnStep } from '@/engine/learn'
 import CardFace from '@/components/CardFace'
 
 interface LearnProps {
@@ -11,10 +9,6 @@ interface LearnProps {
 }
 
 type Phase = 'loading' | 'mc' | 'typed' | 'close' | 'done'
-
-function answerFor(note: Note, card: Card): string {
-  return note.type === 'cloze' ? clozeAnswer(note.fields.term, card.ord) : note.fields.definition
-}
 
 export default function Learn({ deckId }: LearnProps) {
   const [phase, setPhase] = useState<Phase>('loading')
@@ -97,6 +91,7 @@ export default function Learn({ deckId }: LearnProps) {
       const result = session.answerTyped(typedValue)
       setProgress(session.progress())
       if (result === 'close') {
+        revealAtRef.current = Date.now()
         setPhase('close')
       } else {
         advance()
@@ -110,7 +105,8 @@ export default function Learn({ deckId }: LearnProps) {
     advance()
   }, [advance])
 
-  const acceptWrong = useCallback(() => {
+  const declineClose = useCallback(() => {
+    sessionRef.current?.declineClose()
     advance()
   }, [advance])
 
@@ -145,7 +141,7 @@ export default function Learn({ deckId }: LearnProps) {
   }
 
   const note = step.note
-  const correctAnswer = answerFor(note, step.card)
+  const correctAnswer = answerForNote(note, step.card)
   const pct = progress.total === 0 ? 0 : Math.round((progress.cleared / progress.total) * 100)
 
   return (
@@ -204,7 +200,7 @@ export default function Learn({ deckId }: LearnProps) {
             <div className="learn-close">
               <div className="learn-close-hint">Close. Was that right?</div>
               <div className="learn-close-actions">
-                <button type="button" className="btn btn-block" onClick={acceptWrong}>
+                <button type="button" className="btn btn-block" onClick={declineClose}>
                   No, mark wrong
                 </button>
                 <button type="button" className="btn btn-accent btn-block" onClick={overrideCorrect}>

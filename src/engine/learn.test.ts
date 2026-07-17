@@ -133,6 +133,61 @@ describe('createLearnSession', () => {
     expect(session.progress()).toEqual({ cleared: 1, total: 1 })
   })
 
+  it('declineClose resets a close-graded card to round 1, requeues it behind other cards, and never fires onDueReview', () => {
+    const note = makeNote('perro')
+    const dueCard = makeCard(note, { state: 2, due: Date.now() - 1000 })
+    const other = makeNote('gato')
+    const otherCard = makeCard(other)
+    const onDueReview = vi.fn()
+    const session = createLearnSession([dueCard, otherCard], [note, other], {
+      rng: mulberry32(10),
+      onDueReview,
+    })
+
+    // dueCard through round 1 -> round 2.
+    let step = session.next()!
+    expect(step.card.id).toBe(dueCard.id)
+    expect(step.round).toBe(1)
+    session.answerMc(true)
+
+    // otherCard through round 1 -> round 2 (not cleared, stays in the queue).
+    step = session.next()!
+    expect(step.card.id).toBe(otherCard.id)
+    expect(step.round).toBe(1)
+    session.answerMc(true)
+
+    // Back to dueCard's round 2, grade it 'close'.
+    step = session.next()!
+    expect(step.card.id).toBe(dueCard.id)
+    expect(step.round).toBe(2)
+    expect(session.answerTyped('perr')).toBe('close')
+
+    session.declineClose()
+    expect(session.progress()).toEqual({ cleared: 0, total: 2 })
+    expect(onDueReview).not.toHaveBeenCalled()
+
+    // The stall scenario: next() must return a DIFFERENT entry, not the same declined one stuck at front.
+    const after = session.next()!
+    expect(after.card.id).not.toBe(dueCard.id)
+    expect(after.card.id).toBe(otherCard.id)
+    expect(after.round).toBe(2)
+
+    // Cycling back around, the declined card should be back at round 1.
+    let sawDueCardAgain = false
+    for (let i = 0; i < 10; i++) {
+      const s = session.next()
+      if (!s) break
+      if (s.card.id === dueCard.id) {
+        expect(s.round).toBe(1)
+        sawDueCardAgain = true
+        break
+      }
+      if (s.round === 1) session.answerMc(true)
+      else session.answerTyped('nonsense')
+    }
+    expect(sawDueCardAgain).toBe(true)
+  })
+
   it('offers up to 3 distractors (4 choices) when >=4 cards are in the set, and always includes the correct answer', () => {
     const notes = ['perro', 'gato', 'pajaro', 'pez', 'caballo'].map(d => makeNote(d))
     const cards = notes.map(n => makeCard(n))

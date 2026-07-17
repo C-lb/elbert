@@ -23,6 +23,7 @@ export interface LearnSession {
   answerMc(correct: boolean): void
   answerTyped(text: string): 'correct' | 'close' | 'wrong'
   overrideCorrect(): void
+  declineClose(): void
   progress(): { cleared: number; total: number }
 }
 
@@ -32,7 +33,8 @@ interface Entry {
   round: LearnRound
 }
 
-function answerFor(card: Card, note: Note): string {
+/** The answer text for a card: the blanked cloze span, or the note's definition otherwise. */
+export function answerForNote(note: Note, card: Card): string {
   return note.type === 'cloze' ? clozeAnswer(note.fields.term, card.ord) : note.fields.definition
 }
 
@@ -63,12 +65,12 @@ export function createLearnSession(cards: Card[], notes: Note[], opts: LearnOpts
   )
 
   // Fixed pool of answers across the whole set, used for round-1 distractors throughout the session.
-  const allAnswers = entries.map(e => ({ id: e.card.id, answer: answerFor(e.card, e.note) }))
+  const allAnswers = entries.map(e => ({ id: e.card.id, answer: answerForNote(e.note, e.card) }))
 
   const queue: Entry[] = [...entries]
 
   function buildChoices(entry: Entry): string[] {
-    const correct = answerFor(entry.card, entry.note)
+    const correct = answerForNote(entry.note, entry.card)
     const pool = [...new Set(allAnswers.filter(a => a.id !== entry.card.id && a.answer !== correct).map(a => a.answer))]
     const distractors = shuffle(pool, rng).slice(0, 3)
     return shuffle([correct, ...distractors], rng)
@@ -108,7 +110,7 @@ export function createLearnSession(cards: Card[], notes: Note[], opts: LearnOpts
     answerTyped(text: string) {
       const entry = queue[0]
       if (!entry) throw new Error('no current card')
-      const result = grade(answerFor(entry.card, entry.note), text)
+      const result = grade(answerForNote(entry.note, entry.card), text)
       if (result === 'correct') {
         clearCurrent()
       } else if (result === 'wrong') {
@@ -122,6 +124,13 @@ export function createLearnSession(cards: Card[], notes: Note[], opts: LearnOpts
     overrideCorrect() {
       if (!queue[0]) return
       clearCurrent()
+    },
+
+    declineClose() {
+      const entry = queue[0]
+      if (!entry) return
+      entry.round = 1
+      requeue()
     },
 
     progress() {
