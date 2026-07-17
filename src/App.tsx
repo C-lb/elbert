@@ -3,10 +3,12 @@ import Nav from '@/components/Nav'
 import Home from '@/screens/Home'
 import Settings from '@/screens/Settings'
 import Study from '@/screens/Study'
+import Editor from '@/screens/Editor'
+import DeckSettings from '@/screens/DeckSettings'
 import { requestSync, useSyncStatus } from '@/sync/status'
 
 interface Route {
-  name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'generate' | 'settings'
+  name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'deck' | 'settings'
   deckId?: string
 }
 
@@ -27,8 +29,8 @@ function parseHash(hash: string): Route {
       return { name: 'match', deckId: param }
     case 'edit':
       return { name: 'edit', deckId: param }
-    case 'generate':
-      return { name: 'generate' }
+    case 'deck':
+      return { name: 'deck', deckId: param }
     case 'settings':
       return { name: 'settings' }
     default:
@@ -67,7 +69,7 @@ const TITLES: Record<Route['name'], string> = {
   test: 'Test',
   match: 'Match',
   edit: 'Edit deck',
-  generate: 'Generate cards',
+  deck: 'Deck settings',
   settings: 'Settings',
 }
 
@@ -88,7 +90,6 @@ function App() {
           <Home
             onStudy={deckId => navigate(deckId ? `#/study/${deckId}` : '#/study')}
             onOpenDeck={deckId => navigate(`#/study/${deckId}`)}
-            onCapture={() => navigate('#/generate')}
           />
         )
       case 'settings':
@@ -102,9 +103,21 @@ function App() {
       case 'match':
         return <NotBuilt label="Match mode" />
       case 'edit':
-        return <NotBuilt label="Deck editor" />
-      case 'generate':
-        return <NotBuilt label="Card generator" />
+        return route.deckId ? (
+          <Editor deckId={route.deckId} onOpenSettings={id => navigate(`#/deck/${id}`)} />
+        ) : (
+          <NotBuilt label="Deck editor" />
+        )
+      case 'deck':
+        return route.deckId ? (
+          <DeckSettings
+            deckId={route.deckId}
+            onDeleted={() => navigate('#/')}
+            onBack={() => navigate(`#/edit/${route.deckId}`)}
+          />
+        ) : (
+          <NotBuilt label="Deck settings" />
+        )
     }
   })()
 

@@ -1,8 +1,12 @@
-import { describe, it, expect } from 'vitest'
+import 'fake-indexeddb/auto'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { db } from '@/data/db'
 import { parseCloze, renderCloze } from './cloze'
-import { cardsForNote } from './cards-from-note'
+import { cardsForNote, syncCardsWithNote } from './cards-from-note'
 
 const note = (type: any, term: string): any => ({ id: 'n1', deckId: 'd1', type, fields: { term, definition: 'def' }, tags: [], deletedAt: null })
+
+beforeEach(async () => { await Promise.all(db.tables.map(t => t.clear())) })
 
 describe('cloze', () => {
   it('finds distinct ordinals and hints', () => {
@@ -24,5 +28,79 @@ describe('cardsForNote', () => {
     const [c] = cardsForNote(note('basic', 'hola'))
     expect(c.state).toBe(0)
     expect(c.due).toBeLessThanOrEqual(Date.now())
+  })
+})
+
+describe('syncCardsWithNote', () => {
+  it('new note with no cards yet creates all via cardsForNote', async () => {
+    const n = note('basic', 'hola')
+    await syncCardsWithNote(n)
+    const cards = await db.cards.where('noteId').equals('n1').toArray()
+    expect(cards).toHaveLength(1)
+    expect(cards[0].ord).toBe(0)
+    expect(cards[0].deletedAt).toBeNull()
+  })
+
+  it('cloze: adding a new ordinal creates a missing card, leaves existing untouched', async () => {
+    const n = note('cloze', '{{c1::a}} {{c2::b}}')
+    await syncCardsWithNote(n)
+    const before = await db.cards.where('noteId').equals('n1').toArray()
+    const c1 = before.find(c => c.ord === 1)!
+    // simulate FSRS progress on card ord=1
+    await db.cards.put({ ...c1, reps: 5, stability: 12.3, dirty: 0 })
+
+    const n2 = note('cloze', '{{c1::a}} {{c2::b}} {{c3::c}}')
+    n2.id = 'n1'
+    await syncCardsWithNote(n2)
+
+    const after = await db.cards.where('noteId').equals('n1').toArray()
+    const live = after.filter(c => c.deletedAt == null)
+    expect(live.map(c => c.ord).sort()).toEqual([1, 2, 3])
+    const c1After = after.find(c => c.ord === 1)!
+    expect(c1After.reps).toBe(5)
+    expect(c1After.stability).toBe(12.3)
+  })
+
+  it('cloze: removing an ordinal soft-deletes its card', async () => {
+    const n = note('cloze', '{{c1::a}} {{c2::b}}')
+    await syncCardsWithNote(n)
+
+    const n2 = note('cloze', '{{c1::a}}')
+    n2.id = 'n1'
+    await syncCardsWithNote(n2)
+
+    const after = await db.cards.where('noteId').equals('n1').toArray()
+    const ord2 = after.find(c => c.ord === 2)!
+    expect(ord2.deletedAt).not.toBeNull()
+    const ord1 = after.find(c => c.ord === 1)!
+    expect(ord1.deletedAt).toBeNull()
+  })
+
+  it('type change basic -> basic_reversed adds ord-1 card', async () => {
+    const n = note('basic', 'hola')
+    await syncCardsWithNote(n)
+
+    const n2 = note('basic_reversed', 'hola')
+    n2.id = 'n1'
+    await syncCardsWithNote(n2)
+
+    const after = await db.cards.where('noteId').equals('n1').toArray()
+    const live = after.filter(c => c.deletedAt == null)
+    expect(live.map(c => c.ord).sort()).toEqual([0, 1])
+  })
+
+  it('type change basic_reversed -> basic soft-deletes ord 1', async () => {
+    const n = note('basic_reversed', 'hola')
+    await syncCardsWithNote(n)
+
+    const n2 = note('basic', 'hola')
+    n2.id = 'n1'
+    await syncCardsWithNote(n2)
+
+    const after = await db.cards.where('noteId').equals('n1').toArray()
+    const live = after.filter(c => c.deletedAt == null)
+    expect(live.map(c => c.ord)).toEqual([0])
+    const ord1 = after.find(c => c.ord === 1)!
+    expect(ord1.deletedAt).not.toBeNull()
   })
 })

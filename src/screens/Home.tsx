@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { dueCounts } from '@/engine/queue'
 import DeckList from '@/screens/DeckList'
+import QuickCapture from '@/components/QuickCapture'
 
 interface HomeProps {
   onStudy: (deckId?: string) => void
   onOpenDeck: (deckId: string) => void
-  onCapture: () => void
 }
 
 function PlusIcon() {
@@ -16,12 +16,24 @@ function PlusIcon() {
   )
 }
 
-export default function Home({ onStudy, onOpenDeck, onCapture }: HomeProps) {
+export default function Home({ onStudy, onOpenDeck }: HomeProps) {
   const [due, setDue] = useState<number | null>(null)
+  const [capturing, setCapturing] = useState(false)
+  const [toast, setToast] = useState(false)
+
+  const refreshDue = () => {
+    dueCounts().then(counts => setDue(counts.due + counts.newAvailable))
+  }
 
   useEffect(() => {
-    dueCounts().then(counts => setDue(counts.due + counts.newAvailable))
+    refreshDue()
   }, [])
+
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(false), 2000)
+    return () => clearTimeout(t)
+  }, [toast])
 
   return (
     <div className="screen">
@@ -35,9 +47,22 @@ export default function Home({ onStudy, onOpenDeck, onCapture }: HomeProps) {
 
       <DeckList onOpenDeck={onOpenDeck} />
 
-      <button className="fab" onClick={onCapture} aria-label="Quick capture">
+      <button className="fab" onClick={() => setCapturing(true)} aria-label="Quick capture">
         <PlusIcon />
       </button>
+
+      {capturing && (
+        <QuickCapture
+          onClose={() => setCapturing(false)}
+          onSaved={() => {
+            setCapturing(false)
+            refreshDue()
+            setToast(true)
+          }}
+        />
+      )}
+
+      {toast && <div className="toast toast-success">Card saved to Inbox</div>}
     </div>
   )
 }
