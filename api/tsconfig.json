@@ -2,8 +2,8 @@
   "compilerOptions": {
     "target": "es2023",
     "lib": ["ES2023"],
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "types": ["node"],
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
