@@ -54,8 +54,8 @@
 //
 // Table/column names below are a fixed whitelist — never interpolate a
 // client-supplied identifier into SQL.
-import { assertKey, UnauthorizedError } from './_lib/auth.ts'
-import { getDb, DatabaseNotConfiguredError, type QueryDesc } from './_lib/pg.ts'
+import { assertKey, UnauthorizedError } from './_lib/auth'
+import { getDb, DatabaseNotConfiguredError, type QueryDesc } from './_lib/pg'
 
 export const SYNCED_TABLES = ['decks', 'notes', 'cards', 'reviews', 'media'] as const
 export type SyncedTable = (typeof SYNCED_TABLES)[number]
