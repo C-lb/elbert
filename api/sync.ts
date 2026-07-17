@@ -32,10 +32,25 @@
 // a review is an immutable log entry, never edited after the fact.
 //
 // Pull: for every one of the 5 tables (not just the ones pushed to), select
-// all rows with `seq > cursor`. The response cursor is read via
-// `SELECT last_value FROM sync_seq` AFTER the pull selects, all inside the
-// same transaction, so a client that stores the returned cursor and pulls
-// again is guaranteed to see nothing new until another push lands.
+// all rows with `seq > cursor`. The response cursor is read AFTER the pull
+// selects, all inside the same transaction, so a client that stores the
+// returned cursor and pulls again is guaranteed to see nothing new until
+// another push lands.
+//
+// Concurrency (deviation from the original "SELECT last_value FROM
+// sync_seq" plan text, controller-approved): `last_value` on a sequence is
+// NOT transactional — it's a global counter mutated outside MVCC snapshot
+// isolation. A pull racing a concurrent, not-yet-committed push could read
+// a `last_value` past rows that commit a moment later, permanently skipping
+// them for that client. Fixed by making `SELECT pg_advisory_xact_lock(42)`
+// the FIRST query of every sync transaction (both driver paths — it's just
+// another statement in the batch): it serializes all sync requests against
+// each other, held until COMMIT, so no push can commit while another
+// request's pull is still running. Also: `last_value` is defined even
+// before a sequence's first `nextval()`, so on a virgin schema (no rows
+// ever synced) a naive `SELECT last_value` returns 1, not 0 — which would
+// skip the very first row (seq=1). Guarded with
+// `SELECT CASE WHEN is_called THEN last_value ELSE 0 END`.
 //
 // Table/column names below are a fixed whitelist — never interpolate a
 // client-supplied identifier into SQL.
@@ -84,6 +99,31 @@ const TABLES: Record<SyncedTable, TableConfig> = {
 
 function isSyncedTable(table: unknown): table is SyncedTable {
   return typeof table === 'string' && (SYNCED_TABLES as readonly string[]).includes(table)
+}
+
+const REQUIRED_COLUMNS = ['id', 'updated_at'] as const
+
+export class InvalidRowError extends Error {
+  statusCode = 400
+  table: string
+  id: unknown
+  missing: string[]
+  constructor(table: string, id: unknown, missing: string[]) {
+    super(`invalid row for table "${table}": missing ${missing.join(', ')}`)
+    this.table = table
+    this.id = id
+    this.missing = missing
+  }
+}
+
+/** Every required column (shared + per-table payload) must be present and non-undefined. */
+function validateRow(table: SyncedTable, row: Record<string, unknown>): void {
+  const cfg = TABLES[table]
+  const required = [...REQUIRED_COLUMNS, ...cfg.columns]
+  const missing = required.filter((col) => row[col] === undefined)
+  if (missing.length > 0) {
+    throw new InvalidRowError(table, row.id, missing)
+  }
 }
 
 function buildUpsert(table: SyncedTable, row: Record<string, unknown>): QueryDesc {
@@ -152,28 +192,56 @@ export default async function handler(req: SyncRequest, res: SyncResponse): Prom
     return
   }
 
-  const body = (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) as SyncRequestBody
+  let body: SyncRequestBody
+  try {
+    body = (typeof req.body === 'string' ? JSON.parse(req.body) : req.body) as SyncRequestBody
+  } catch {
+    res.status(400).json({ error: 'malformed JSON body' })
+    return
+  }
+
   const push = Array.isArray(body?.push) ? body.push : []
   const cursor = typeof body?.cursor === 'number' ? body.cursor : 0
 
   const upsertQueries: QueryDesc[] = []
-  for (const entry of push) {
-    if (!isSyncedTable(entry.table)) continue
-    for (const row of entry.rows ?? []) {
-      upsertQueries.push(buildUpsert(entry.table, row))
+  try {
+    for (const entry of push) {
+      if (!isSyncedTable(entry.table)) continue
+      for (const row of entry.rows ?? []) {
+        validateRow(entry.table, row)
+        upsertQueries.push(buildUpsert(entry.table, row))
+      }
     }
+  } catch (err) {
+    if (err instanceof InvalidRowError) {
+      res.status(400).json({ error: err.message, table: err.table, id: err.id })
+      return
+    }
+    throw err
   }
+
+  // First query in the batch: serializes all sync requests against each
+  // other (held until COMMIT) so a concurrent pull can never observe a
+  // cursor past rows from a push that hasn't committed yet. See the module
+  // comment above for the full race explanation.
+  const lockQuery: QueryDesc = { text: 'SELECT pg_advisory_xact_lock(42)', params: [] }
 
   const pullQueries: QueryDesc[] = SYNCED_TABLES.map((table) => ({
     text: `SELECT * FROM ${table} WHERE seq > $1`,
     params: [cursor],
   }))
-  const cursorQuery: QueryDesc = { text: 'SELECT last_value FROM sync_seq', params: [] }
+  // Virgin-safe: `last_value` is defined (as 1) even before the sequence's
+  // first nextval(), which would otherwise skip seq=1 on a fresh schema.
+  const cursorQuery: QueryDesc = {
+    text: 'SELECT CASE WHEN is_called THEN last_value ELSE 0 END AS last_value FROM sync_seq',
+    params: [],
+  }
 
   const db = getDb()
-  const results = await db.transaction([...upsertQueries, ...pullQueries, cursorQuery])
+  const results = await db.transaction([lockQuery, ...upsertQueries, ...pullQueries, cursorQuery])
 
-  const pullResults = results.slice(upsertQueries.length, upsertQueries.length + SYNCED_TABLES.length)
+  const pullStart = 1 + upsertQueries.length
+  const pullResults = results.slice(pullStart, pullStart + SYNCED_TABLES.length)
   const cursorRows = results[results.length - 1] as { last_value: string | number }[]
   const nextCursor = Number(cursorRows[0]?.last_value ?? cursor)
 

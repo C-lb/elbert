@@ -164,4 +164,58 @@ describe.skipIf(!PG_TEST_URL)('POST /api/sync', () => {
     }
     expect(secondBody.cursor).toBe(firstBody.cursor)
   })
+
+  it('virgin schema: pull-only returns cursor 0, then a push surfaces the first row (seq=1)', async () => {
+    const virgin = await call({ push: [], cursor: 0 })
+    expect(virgin.statusCode).toBe(200)
+    const virginBody = virgin.body as { pulled: { table: string; rows: unknown[] }[]; cursor: number }
+    expect(virginBody.cursor).toBe(0)
+    for (const entry of virginBody.pulled) {
+      expect(entry.rows).toHaveLength(0)
+    }
+
+    const pushed = await call({
+      push: [{
+        table: 'decks',
+        rows: [{ id: 'deck-virgin', updated_at: 1000, deleted_at: null, name: 'First', parent_id: null, new_per_day: 5, desired_retention: 0.9 }],
+      }],
+      cursor: 0,
+    })
+    const pushedBody = pushed.body as { pulled: { table: string; rows: unknown[] }[]; cursor: number }
+    const decksPulled = pushedBody.pulled.find((p) => p.table === 'decks')!.rows as Record<string, unknown>[]
+    expect(decksPulled).toHaveLength(1)
+    expect(decksPulled[0]).toMatchObject({ id: 'deck-virgin' })
+    expect(Number((decksPulled[0] as { seq: string | number }).seq)).toBe(1)
+    expect(pushedBody.cursor).toBe(1)
+  })
+
+  it('malformed JSON body returns 400, not 500', async () => {
+    const res = makeRes()
+    await handler(makeReq('{not valid json', ELBERT_KEY), res)
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('rejects a cards row missing learning_steps with 400 and applies nothing', async () => {
+    const res = await call({
+      push: [{
+        table: 'cards',
+        rows: [{
+          id: 'card-bad', updated_at: 1000, deleted_at: null, note_id: 'note-1', ord: 0,
+          due: 1000, stability: 1, difficulty: 1, reps: 0, lapses: 0, state: 0,
+          last_review: null, suspended: 0,
+          // learning_steps intentionally omitted
+        }],
+      }],
+      cursor: 0,
+    })
+    expect(res.statusCode).toBe(400)
+    const body = res.body as { error: string; table: string; id: string }
+    expect(body.table).toBe('cards')
+    expect(body.id).toBe('card-bad')
+
+    const pull = await call({ push: [], cursor: 0 })
+    const pullBody = pull.body as { pulled: { table: string; rows: unknown[] }[] }
+    const cardsPulled = pullBody.pulled.find((p) => p.table === 'cards')!.rows
+    expect(cardsPulled).toHaveLength(0)
+  })
 })
