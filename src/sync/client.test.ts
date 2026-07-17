@@ -31,6 +31,16 @@ describe('sync()', () => {
     expect(result).toEqual({ error: 'no key' })
   })
 
+  it('does not call fetch when no sync key is set', async () => {
+    await saveSettings({ syncKey: '' })
+    const fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+
+    await sync()
+
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
   it('pushes dirty rows snake_cased and clears dirty flags on success', async () => {
     await repo.put('decks', {
       id: 'd1', name: 'Spanish', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null,
@@ -207,5 +217,96 @@ describe('sync()', () => {
     const row = await db.decks.get('d1')
     expect(row!.dirty).toBe(1)
     expect(await repo.getMeta('syncCursor')).toBe(3)
+  })
+
+  it('never throws when applying a pulled row fails (e.g. IndexedDB quota) — returns { error }, dirty rows stay intact', async () => {
+    // A dirty row on a DIFFERENT table than the one that fails during apply: the whole
+    // clear-dirty/apply/cursor sequence runs in one transaction, so if applying the pulled
+    // decks row blows up, this note's dirty flag must roll back to still being set.
+    await repo.put('notes', {
+      id: 'n1', deckId: 'd1', type: 'basic',
+      fields: { term: 'hola', definition: 'hello' }, tags: [], deletedAt: null,
+    })
+    await repo.setMeta('syncCursor', 1)
+
+    vi.stubGlobal('fetch', vi.fn(async () => ({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        pulled: [
+          {
+            table: 'decks',
+            rows: [{
+              id: 'd1', updated_at: '5000', deleted_at: null,
+              name: 'Spanish', parent_id: null, new_per_day: 15, desired_retention: 0.9,
+            }],
+          },
+          { table: 'notes', rows: [] },
+          { table: 'cards', rows: [] },
+          { table: 'reviews', rows: [] },
+          { table: 'media', rows: [] },
+        ],
+        cursor: 99,
+      }),
+    })))
+
+    const bulkPutSpy = vi.spyOn(db.decks, 'bulkPut').mockRejectedValue(new Error('quota exceeded'))
+
+    const result = await sync()
+
+    expect(result).toHaveProperty('error')
+
+    const note = await db.notes.get('n1')
+    expect(note!.dirty).toBe(1)
+    expect(await repo.getMeta('syncCursor')).toBe(1)
+
+    bulkPutSpy.mockRestore()
+  })
+
+  it('round-trips media through sync(): blob -> base64 on push, base64 -> blob on pull', async () => {
+    const content = 'hello world'
+    const blob = new Blob([content], { type: 'text/plain' })
+    await repo.put('media', { id: 'm1', hash: 'h1', mime: 'text/plain', blob, deletedAt: null })
+
+    let capturedBody: any = null
+    const wireBase64 = btoa(content)
+
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init: RequestInit) => {
+      capturedBody = JSON.parse(init.body as string)
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({
+          pulled: [
+            { table: 'decks', rows: [] },
+            { table: 'notes', rows: [] },
+            { table: 'cards', rows: [] },
+            { table: 'reviews', rows: [] },
+            {
+              table: 'media',
+              rows: [{
+                id: 'm1', updated_at: '9999999999999', deleted_at: null,
+                hash: 'h1', mime: 'text/plain', data_base64: wireBase64,
+              }],
+            },
+          ],
+          cursor: 11,
+        }),
+      }
+    }))
+
+    const result = await sync()
+
+    expect(result).toEqual({ pushed: 1, pulled: 1 })
+
+    // push side: the blob went out as base64
+    const pushedRow = capturedBody.push.find((p: any) => p.table === 'media').rows[0]
+    expect(pushedRow.data_base64).toBe(wireBase64)
+
+    // pull side: the base64 came back in as a Blob with the original content
+    const stored = await db.media.get('m1')
+    expect(stored!.blob).toBeInstanceOf(Blob)
+    expect(await stored!.blob!.text()).toBe(content)
+    expect(stored!.dirty).toBe(0)
   })
 })

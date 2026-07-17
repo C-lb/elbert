@@ -21,9 +21,13 @@ function reportSyncResult(result: SyncResult): void {
   listeners.forEach(fn => fn())
 }
 
-/** Fire-and-forget sync: never awaited by callers, result recorded for every useSyncStatus() instance. */
+/**
+ * Fire-and-forget sync: never awaited by callers, result recorded for every useSyncStatus()
+ * instance. sync() itself never throws/rejects, but the .catch() is a belt-and-braces guard
+ * against an unhandled rejection at any call site (e.g. Study's finish(), App's mount effect).
+ */
 export function requestSync(): void {
-  void sync().then(reportSyncResult)
+  void sync().then(reportSyncResult).catch(err => reportSyncResult({ error: String(err) }))
 }
 
 /** Live pending-dirty-row count plus the outcome of the most recent sync. Polls Dexie; no deps on the sync module itself. */
