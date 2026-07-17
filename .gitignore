@@ -13,6 +13,10 @@ dist-ssr
 *.local
 .env*
 .vercel
+test-results
+playwright-report
+blob-report
+playwright/.cache
 
 # controller scratch
 .superpowers

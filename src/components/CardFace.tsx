@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { db } from '@/data/db'
 import { renderCloze } from '@/engine/cloze'
 import { speak } from '@/lib/tts'
+import ShaderBackdrop from '@/components/ShaderBackdrop'
 import type { Note } from '@/data/types'
 
 interface CardFaceProps {
@@ -57,16 +58,19 @@ export default function CardFace({ note, ord, revealed, lang }: CardFaceProps) {
 
   return (
     <div className="card-face">
-      <div className="card-face-text">{text}</div>
-      {imageUrl && <img className="card-face-image" src={imageUrl} alt="" />}
-      {revealed && note.fields.example && <div className="card-face-example">{note.fields.example}</div>}
-      <button
-        className="btn-icon card-face-speak"
-        onClick={() => speak(speakText, lang)}
-        aria-label="Play pronunciation"
-      >
-        <SpeakerIcon />
-      </button>
+      <ShaderBackdrop deckId={note.deckId} />
+      <div className="card-face-content">
+        <div className="card-face-text">{text}</div>
+        {imageUrl && <img className="card-face-image" src={imageUrl} alt="" />}
+        {revealed && note.fields.example && <div className="card-face-example">{note.fields.example}</div>}
+        <button
+          className="btn-icon card-face-speak"
+          onClick={() => speak(speakText, lang)}
+          aria-label="Play pronunciation"
+        >
+          <SpeakerIcon />
+        </button>
+      </div>
     </div>
   )
 }
