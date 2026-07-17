@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { db } from '@/data/db'
+import { liveNotes } from '@/data/live'
 import { repo } from '@/data/repo'
 import { createMatchGame, type MatchGame, type MatchTile } from '@/engine/match'
 import type { Note } from '@/data/types'
@@ -33,7 +33,7 @@ function formatSeconds(ms: number): string {
 
 export default function Match({ deckId }: MatchProps) {
   const [phase, setPhase] = useState<Phase>('loading')
-  const [notes, setNotes] = useState<Note[]>([])
+  const [notes, setNotes] = useState<Note[] | null>(null)
   const [seed, setSeed] = useState(1)
   const [tiles, setTiles] = useState<MatchTile[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -51,7 +51,7 @@ export default function Match({ deckId }: MatchProps) {
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const loaded = await db.notes.filter(n => n.deletedAt == null && (!deckId || n.deckId === deckId)).toArray()
+      const loaded = await liveNotes(deckId)
       const storedBest = deckId ? await repo.getMeta<number>(bestKey(deckId)) : undefined
       if (cancelled) return
       setNotes(loaded)
@@ -64,7 +64,7 @@ export default function Match({ deckId }: MatchProps) {
   }, [deckId])
 
   useEffect(() => {
-    if (notes.length === 0) return
+    if (notes == null || notes.length === 0) return
     const game = createMatchGame(notes, mulberry32(seed))
     gameRef.current = game
     setTiles(game.tiles())
@@ -137,7 +137,7 @@ export default function Match({ deckId }: MatchProps) {
   const totalMisses = gameRef.current?.misses() ?? misses
   const grid = useMemo(() => tiles, [tiles])
 
-  if (phase === 'loading') {
+  if (notes == null) {
     return (
       <div className="screen">
         <div className="stub">Loading deck…</div>
@@ -150,6 +150,15 @@ export default function Match({ deckId }: MatchProps) {
     return (
       <div className="screen">
         <div className="stub">No notes in this deck to match yet.</div>
+        <a className="btn btn-block" href="#/">Back home</a>
+      </div>
+    )
+  }
+
+  if (phase === 'loading') {
+    return (
+      <div className="screen">
+        <div className="stub">Loading deck…</div>
         <a className="btn btn-block" href="#/">Back home</a>
       </div>
     )

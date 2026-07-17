@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { v4 as uuid } from 'uuid'
 import { db } from '@/data/db'
 import { repo } from '@/data/repo'
-import { dueCounts } from '@/engine/queue'
+import { dueCountsAll } from '@/engine/queue'
 import type { Deck } from '@/data/types'
 
 interface DeckRow {
@@ -31,12 +31,11 @@ export default function DeckList({ onOpenDeck }: DeckListProps) {
 
   const load = async () => {
     const decks = await db.decks.filter(d => d.deletedAt == null).toArray()
-    const withCounts = await Promise.all(
-      decks.map(async deck => {
-        const counts = await dueCounts(deck.id)
-        return { deck, due: counts.due, newAvailable: counts.newAvailable }
-      }),
-    )
+    const counts = await dueCountsAll()
+    const withCounts = decks.map(deck => {
+      const c = counts.get(deck.id) ?? { due: 0, newAvailable: 0 }
+      return { deck, due: c.due, newAvailable: c.newAvailable }
+    })
     setRows(withCounts)
   }
 

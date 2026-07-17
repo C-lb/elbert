@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { db } from '@/data/db'
+import { liveNotes } from '@/data/live'
 import { generateTest, gradePaper, type TestAnswers, type TestCounts, type TestPaper, type TestResult } from '@/engine/testgen'
 import type { Note } from '@/data/types'
 
@@ -74,7 +74,7 @@ export default function TestMode({ deckId }: TestModeProps) {
   useEffect(() => {
     let cancelled = false
     ;(async () => {
-      const loaded = await db.notes.filter(n => n.deletedAt == null && (!deckId || n.deckId === deckId)).toArray()
+      const loaded = await liveNotes(deckId)
       if (cancelled) return
       setNotes(loaded)
       const n = loaded.length

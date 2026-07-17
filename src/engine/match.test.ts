@@ -136,6 +136,14 @@ describe('createMatchGame', () => {
     expect(game.pick(answerB.id)).toBe('done')
   })
 
+  it('basic_reversed notes still pair term tile with definition tile (never term/term)', () => {
+    const n: Note = { ...note('a'), type: 'basic_reversed' }
+    const game = createMatchGame([n], mulberry32(1))
+    const tiles = game.tiles()
+    expect(tiles.find(t => t.kind === 'term')?.text).toBe(n.fields.term)
+    expect(tiles.find(t => t.kind === 'answer')?.text).toBe(n.fields.definition)
+  })
+
   it('handles cloze notes via answerForNote for the answer tile text', () => {
     const clozeNote: Note = {
       id: 'z',

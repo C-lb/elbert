@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { db } from '@/data/db'
+import { liveNotes } from '@/data/live'
 import { applyReview } from '@/engine/scheduler'
 import { createLearnSession, answerForNote, type LearnSession, type LearnStep } from '@/engine/learn'
 import CardFace from '@/components/CardFace'
@@ -24,7 +25,7 @@ export default function Learn({ deckId }: LearnProps) {
     let cancelled = false
 
     ;(async () => {
-      const notes = await db.notes.filter(n => n.deletedAt == null && (!deckId || n.deckId === deckId)).toArray()
+      const notes = await liveNotes(deckId)
       const noteIds = new Set(notes.map(n => n.id))
       const cards = (await db.cards.toArray()).filter(
         c => c.deletedAt == null && c.suspended !== 1 && noteIds.has(c.noteId)

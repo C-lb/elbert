@@ -30,6 +30,24 @@ export function requestSync(): void {
   void sync().then(reportSyncResult).catch(err => reportSyncResult({ error: String(err) }))
 }
 
+const SYNC_DEBOUNCE_MS = 4000
+
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
+/**
+ * Trailing-debounced requestSync(): every repo-level mutation calls this (via the
+ * listener registered in App.tsx), so bursts like a 500-card import coalesce into
+ * a single push ~4s after the last write. With no sync key configured the
+ * eventual sync() is a silent no-op, same as every other trigger.
+ */
+export function scheduleSync(): void {
+  if (debounceTimer !== null) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    debounceTimer = null
+    requestSync()
+  }, SYNC_DEBOUNCE_MS)
+}
+
 /** Live pending-dirty-row count plus the outcome of the most recent sync. Polls Dexie; no deps on the sync module itself. */
 export function useSyncStatus(): SyncStatus {
   const [pending, setPending] = useState(0)

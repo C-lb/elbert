@@ -6,6 +6,13 @@ import { getSettings } from '@/lib/settings'
 import { cardsForNote } from '@/engine/cards-from-note'
 import DraftList, { type DraftRow } from '@/screens/DraftList'
 import { isUnmarkedCloze } from '@/engine/draft'
+import {
+  CHUNK_BASE64_BUDGET,
+  PageTooLargeError,
+  projectedBase64Length,
+  splitCountAcrossChunks,
+  splitPdfIntoChunks,
+} from '@/lib/pdf-chunks'
 import type { Deck, Note, NoteType } from '@/data/types'
 
 type Mode = 'text' | 'pdf'
@@ -18,7 +25,7 @@ interface Draft {
   fields: { term: string; definition: string; example?: string; hint?: string }
 }
 
-function readFileAsBase64(file: File): Promise<string> {
+function readBlobAsBase64(blob: Blob): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
     reader.onload = () => {
@@ -26,8 +33,23 @@ function readFileAsBase64(file: File): Promise<string> {
       resolve(result.slice(result.indexOf(',') + 1))
     }
     reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
+    reader.readAsDataURL(blob)
   })
+}
+
+/**
+ * Wraps raw PDF bytes for FileReader. The cast narrows Uint8Array<ArrayBufferLike>
+ * to the ArrayBuffer-backed view BlobPart requires; nothing here uses SharedArrayBuffer.
+ */
+function bytesToBlob(bytes: Uint8Array): Blob {
+  return new Blob([bytes as Uint8Array<ArrayBuffer>], { type: 'application/pdf' })
+}
+
+/** "part 3" or "parts 2, 3 and 5". */
+function formatParts(parts: number[]): string {
+  if (parts.length === 1) return `part ${parts[0]}`
+  const head = parts.slice(0, -1).join(', ')
+  return `parts ${head} and ${parts[parts.length - 1]}`
 }
 
 function toRows(drafts: Draft[]): DraftRow[] {
@@ -45,7 +67,7 @@ function toRows(drafts: Draft[]): DraftRow[] {
 export default function Generate() {
   const [mode, setMode] = useState<Mode>('text')
   const [text, setText] = useState('')
-  const [pdfBase64, setPdfBase64] = useState<string | null>(null)
+  const [pdfBytes, setPdfBytes] = useState<Uint8Array | null>(null)
   const [pdfName, setPdfName] = useState<string | null>(null)
   const [pdfError, setPdfError] = useState<string | null>(null)
   const [style, setStyle] = useState<Style>('mix')
@@ -56,10 +78,11 @@ export default function Generate() {
   const [newDeckName, setNewDeckName] = useState('')
 
   const [generating, setGenerating] = useState(false)
+  const [genProgress, setGenProgress] = useState<{ current: number; total: number } | null>(null)
   const [genError, setGenError] = useState<string | null>(null)
   const [rows, setRows] = useState<DraftRow[] | null>(null)
   const [approving, setApproving] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ text: string; tone: 'success' | 'error' } | null>(null)
 
   useEffect(() => {
     db.decks.filter(d => d.deletedAt == null).toArray().then(list => {
@@ -76,44 +99,97 @@ export default function Generate() {
 
   const onPdfFile = async (file: File) => {
     setPdfError(null)
-    setPdfBase64(null)
+    setPdfBytes(null)
     if (file.size > MAX_PDF_BYTES) {
       setPdfError('That PDF is over 10MB. Try a smaller file.')
       return
     }
     setPdfName(file.name)
-    setPdfBase64(await readFileAsBase64(file))
+    setPdfBytes(new Uint8Array(await file.arrayBuffer()))
   }
 
-  const canGenerate = (mode === 'text' ? text.trim().length > 0 : !!pdfBase64) && !generating
+  const canGenerate = (mode === 'text' ? text.trim().length > 0 : !!pdfBytes) && !generating
+
+  const requestDrafts = async (
+    syncKey: string,
+    payload: { text?: string; pdfBase64?: string; count: number },
+  ): Promise<{ ok: true; drafts: Draft[] } | { ok: false; error: string }> => {
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-elbert-key': syncKey },
+        body: JSON.stringify({ ...payload, style }),
+      })
+      const body = await res.json().catch(() => null)
+      if (!res.ok) return { ok: false, error: body?.error || `Generation failed: ${res.status}` }
+      return { ok: true, drafts: body.drafts ?? [] }
+    } catch {
+      return { ok: false, error: 'Network error, could not reach the server.' }
+    }
+  }
 
   const generate = async () => {
     if (!canGenerate) return
     setGenerating(true)
+    setGenProgress(null)
     setGenError(null)
     setRows(null)
     try {
       const settings = await getSettings()
-      const res = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-elbert-key': settings.syncKey },
-        body: JSON.stringify({
-          text: mode === 'text' ? text : undefined,
-          pdfBase64: mode === 'pdf' ? pdfBase64 : undefined,
-          style,
-          count,
-        }),
-      })
-      const body = await res.json().catch(() => null)
-      if (!res.ok) {
-        setGenError(body?.error || `Generation failed: ${res.status}`)
+
+      // Single-request path: notes text, or a PDF whose whole base64 payload
+      // fits one request under Vercel's body size limit.
+      if (mode === 'text' || (pdfBytes && projectedBase64Length(pdfBytes.length) <= CHUNK_BASE64_BUDGET)) {
+        const payload =
+          mode === 'text'
+            ? { text, count }
+            : { pdfBase64: await readBlobAsBase64(bytesToBlob(pdfBytes!)), count }
+        const result = await requestDrafts(settings.syncKey, payload)
+        if (!result.ok) {
+          setGenError(result.error)
+          return
+        }
+        setRows(toRows(result.drafts))
         return
       }
-      setRows(toRows(body.drafts ?? []))
-    } catch {
-      setGenError('Network error, could not reach the server.')
+
+      // Chunked path: split the PDF by pages so each request stays under the
+      // platform body limit, then generate per chunk sequentially.
+      let chunks
+      try {
+        chunks = await splitPdfIntoChunks(pdfBytes!)
+      } catch (err) {
+        setGenError(
+          err instanceof PageTooLargeError
+            ? 'A single page of this PDF is too large to upload, and pages cannot be split further. Try a smaller export.'
+            : 'Could not read that PDF. Try re-exporting it.',
+        )
+        return
+      }
+      const counts = splitCountAcrossChunks(count, chunks.map(c => c.pageCount))
+      const merged: Draft[] = []
+      const failedParts: number[] = []
+      for (let i = 0; i < chunks.length; i++) {
+        setGenProgress({ current: i + 1, total: chunks.length })
+        const pdfBase64 = await readBlobAsBase64(bytesToBlob(chunks[i].bytes))
+        const result = await requestDrafts(settings.syncKey, { pdfBase64, count: counts[i] })
+        if (result.ok) merged.push(...result.drafts)
+        else failedParts.push(i + 1)
+      }
+      if (merged.length === 0) {
+        setGenError('Generation failed for every part of the PDF. Try again.')
+        return
+      }
+      setRows(toRows(merged))
+      if (failedParts.length > 0) {
+        setToast({
+          text: `Generation failed for ${formatParts(failedParts)} of ${chunks.length}, kept the cards from the rest`,
+          tone: 'error',
+        })
+      }
     } finally {
       setGenerating(false)
+      setGenProgress(null)
     }
   }
 
@@ -152,10 +228,10 @@ export default function Generate() {
       }
       const approvedMsg = `Approved ${selected.length} card${selected.length === 1 ? '' : 's'}`
       const skippedMsg = skipped.length > 0 ? `, skipped ${skipped.length} cloze with no blanks` : ''
-      setToast(approvedMsg + skippedMsg)
+      setToast({ text: approvedMsg + skippedMsg, tone: 'success' })
       setRows(null)
       setText('')
-      setPdfBase64(null)
+      setPdfBytes(null)
       setPdfName(null)
       setNewDeckName('')
     } finally {
@@ -293,7 +369,7 @@ export default function Generate() {
             {generating ? (
               <span className="btn-loading">
                 <span className="spinner" aria-hidden="true" />
-                Generating…
+                {genProgress ? `Generating ${genProgress.current}/${genProgress.total}` : 'Generating…'}
               </span>
             ) : (
               'Generate cards'
@@ -328,7 +404,7 @@ export default function Generate() {
         </>
       )}
 
-      {toast && <div className="toast toast-success">{toast}</div>}
+      {toast && <div className={`toast toast-${toast.tone}`}>{toast.text}</div>}
     </div>
   )
 }

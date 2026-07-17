@@ -33,9 +33,26 @@ interface Entry {
   round: LearnRound
 }
 
-/** The answer text for a card: the blanked cloze span, or the note's definition otherwise. */
+/**
+ * The answer text for a card: the blanked cloze span, the term for the reversed
+ * (ord 1) card of a basic_reversed note, or the note's definition otherwise.
+ */
 export function answerForNote(note: Note, card: Card): string {
-  return note.type === 'cloze' ? clozeAnswer(note.fields.term, card.ord) : note.fields.definition
+  if (note.type === 'cloze') return clozeAnswer(note.fields.term, card.ord)
+  if (note.type === 'basic_reversed' && card.ord === 1) return note.fields.term
+  return note.fields.definition
+}
+
+/**
+ * Which "side" of a note a card's answer comes from. Distractors must be drawn
+ * from the same side, otherwise a reversed deck offers terms as options on a
+ * definition question (and vice versa) and the wrong-language choices give the
+ * answer away.
+ */
+export function answerSide(note: Note, card: Card): 'definition' | 'term' | 'cloze' {
+  if (note.type === 'cloze') return 'cloze'
+  if (note.type === 'basic_reversed' && card.ord === 1) return 'term'
+  return 'definition'
 }
 
 function shuffle<T>(arr: T[], rng: () => number): T[] {
@@ -65,13 +82,20 @@ export function createLearnSession(cards: Card[], notes: Note[], opts: LearnOpts
   )
 
   // Fixed pool of answers across the whole set, used for round-1 distractors throughout the session.
-  const allAnswers = entries.map(e => ({ id: e.card.id, answer: answerForNote(e.note, e.card) }))
+  const allAnswers = entries.map(e => ({
+    id: e.card.id,
+    answer: answerForNote(e.note, e.card),
+    side: answerSide(e.note, e.card),
+  }))
 
   const queue: Entry[] = [...entries]
 
   function buildChoices(entry: Entry): string[] {
     const correct = answerForNote(entry.note, entry.card)
-    const pool = [...new Set(allAnswers.filter(a => a.id !== entry.card.id && a.answer !== correct).map(a => a.answer))]
+    const side = answerSide(entry.note, entry.card)
+    const pool = [...new Set(
+      allAnswers.filter(a => a.id !== entry.card.id && a.side === side && a.answer !== correct).map(a => a.answer)
+    )]
     const distractors = shuffle(pool, rng).slice(0, 3)
     return shuffle([correct, ...distractors], rng)
   }

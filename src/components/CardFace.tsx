@@ -48,11 +48,12 @@ export default function CardFace({ note, ord, revealed, lang }: CardFaceProps) {
   const imageUrl = useImageUrl(note.fields.imageId)
   const isCloze = note.type === 'cloze'
 
-  const text = isCloze
-    ? renderCloze(note.fields.term, ord, revealed)
-    : revealed
-      ? note.fields.definition
-      : note.fields.term
+  // The reversed (ord 1) card of a basic_reversed note flips direction: definition on the front, term on the back.
+  const isReversed = note.type === 'basic_reversed' && ord === 1
+  const front = isReversed ? note.fields.definition : note.fields.term
+  const back = isReversed ? note.fields.term : note.fields.definition
+
+  const text = isCloze ? renderCloze(note.fields.term, ord, revealed) : revealed ? back : front
 
   const speakText = isCloze ? renderCloze(note.fields.term, ord, true) : text
 

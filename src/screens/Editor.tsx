@@ -3,22 +3,12 @@ import { v4 as uuid } from 'uuid'
 import { db } from '@/data/db'
 import { repo } from '@/data/repo'
 import { syncCardsWithNote } from '@/engine/cards-from-note'
+import { noteFromRow, sameNoteContent, type UIRow } from '@/engine/editor-row'
 import type { Deck, Note, NoteType } from '@/data/types'
 
 interface EditorProps {
   deckId: string
   onOpenSettings: (deckId: string) => void
-}
-
-interface UIRow {
-  id: string
-  persisted: boolean
-  type: NoteType
-  term: string
-  definition: string
-  example: string
-  hint: string
-  imageId?: string
 }
 
 const TYPE_LABELS: Record<NoteType, string> = {
@@ -29,14 +19,6 @@ const TYPE_LABELS: Record<NoteType, string> = {
 
 function blankRow(): UIRow {
   return { id: uuid(), persisted: false, type: 'basic', term: '', definition: '', example: '', hint: '' }
-}
-
-function noteFromRow(deckId: string, row: UIRow): Note {
-  const fields: Note['fields'] = { term: row.term, definition: row.definition }
-  if (row.example.trim()) fields.example = row.example
-  if (row.hint.trim()) fields.hint = row.hint
-  if (row.imageId) fields.imageId = row.imageId
-  return { id: row.id, deckId, type: row.type, fields, tags: [], deletedAt: null }
 }
 
 function rowFromNote(note: Note): UIRow {
@@ -68,6 +50,41 @@ async function hashBlob(blob: Blob): Promise<string> {
   return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
+// Media size policy. Sync requests hard-fail past ~4.5MB, so stored blobs must stay well clear.
+const IMAGE_MAX_DIMENSION = 1600
+const IMAGE_JPEG_QUALITY = 0.85
+// PNG re-encodes bigger than this lose their transparency case to JPEG.
+const IMAGE_PNG_KEEP_BYTES = 512 * 1024
+const IMAGE_MAX_STORED_BYTES = 2 * 1024 * 1024
+
+function canvasToBlob(canvas: HTMLCanvasElement, type: string, quality?: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(b => (b ? resolve(b) : reject(new Error(`canvas encode failed for ${type}`))), type, quality)
+  })
+}
+
+// Downscales to IMAGE_MAX_DIMENSION on the long edge and recompresses. JPEG by default;
+// a PNG source keeps PNG (transparency) only while the re-encode stays small.
+async function downscaleImage(file: File): Promise<Blob> {
+  const bitmap = await createImageBitmap(file)
+  try {
+    const scale = Math.min(1, IMAGE_MAX_DIMENSION / Math.max(bitmap.width, bitmap.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale))
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale))
+    const ctx = canvas.getContext('2d')
+    if (!ctx) throw new Error('no 2d context')
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    if (file.type === 'image/png') {
+      const png = await canvasToBlob(canvas, 'image/png')
+      if (png.size <= IMAGE_PNG_KEEP_BYTES) return png
+    }
+    return canvasToBlob(canvas, 'image/jpeg', IMAGE_JPEG_QUALITY)
+  } finally {
+    bitmap.close()
+  }
+}
+
 function GearIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -90,6 +107,7 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
   const [deck, setDeck] = useState<Deck | null>(null)
   const [rows, setRows] = useState<UIRow[]>([])
   const [dropTarget, setDropTarget] = useState<string | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
   const termRefs = useRef<Map<string, HTMLInputElement>>(new Map())
   const focusRowIdRef = useRef<string | null>(null)
   // Mirrors `rows` synchronously so commitRow always reads the latest state, even from a
@@ -108,6 +126,12 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
       setRows([...notes.map(rowFromNote), blankRow()])
     })()
   }, [deckId])
+
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 4000)
+    return () => clearTimeout(t)
+  }, [toast])
 
   useEffect(() => {
     if (!focusRowIdRef.current) return
@@ -139,7 +163,13 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
       if (patch) updateRow(id, patch)
       return // nothing to save yet
     }
-    const note = noteFromRow(deckId, row)
+    const existing = await db.notes.get(id)
+    const note = noteFromRow(deckId, row, existing)
+    if (existing && sameNoteContent(note, existing)) {
+      // blur without an actual edit: leave the DB row (tags, dirty flag, updatedAt) untouched
+      if (patch) updateRow(id, patch)
+      return
+    }
     await repo.put('notes', note)
     await syncCardsWithNote(note)
     setRows(prev => ensureTrailingBlank(prev.map(r => (r.id === id ? { ...r, ...patch, persisted: true } : r))))
@@ -212,8 +242,20 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
     const file = e.dataTransfer.files?.[0]
     if (!file || !file.type.startsWith('image/')) return
 
-    const hash = await hashBlob(file)
-    await repo.put('media', { id: hash, hash, blob: file, mime: file.type, deletedAt: null })
+    let blob: Blob
+    try {
+      blob = await downscaleImage(file)
+    } catch {
+      setToast('Could not read that image. Try a different file.')
+      return
+    }
+    if (blob.size > IMAGE_MAX_STORED_BYTES) {
+      setToast('That image is too large to store. Try a smaller one.')
+      return
+    }
+
+    const hash = await hashBlob(blob)
+    await repo.put('media', { id: hash, hash, blob, mime: blob.type, deletedAt: null })
 
     await commitRow(row.id, { imageId: hash })
   }
@@ -342,6 +384,8 @@ export default function Editor({ deckId, onOpenSettings }: EditorProps) {
           + Add row
         </button>
       </div>
+
+      {toast && <div className="toast">{toast}</div>}
     </div>
   )
 }

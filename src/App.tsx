@@ -10,7 +10,8 @@ import Editor from '@/screens/Editor'
 import DeckSettings from '@/screens/DeckSettings'
 import Import from '@/screens/Import'
 import Generate from '@/screens/Generate'
-import { requestSync, useSyncStatus } from '@/sync/status'
+import { requestSync, scheduleSync, useSyncStatus } from '@/sync/status'
+import { setMutationListener } from '@/data/repo'
 
 interface Route {
   name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'deck' | 'settings' | 'import' | 'generate'
@@ -90,8 +91,14 @@ function App() {
 
   useEffect(() => {
     requestSync()
+    // Every repo-level mutation (imports, edits, captures, deck management, AI
+    // approvals) schedules a debounced sync so dirty rows never sit indefinitely.
+    setMutationListener(scheduleSync)
     window.addEventListener('online', requestSync)
-    return () => window.removeEventListener('online', requestSync)
+    return () => {
+      setMutationListener(null)
+      window.removeEventListener('online', requestSync)
+    }
   }, [])
 
   const body = (() => {

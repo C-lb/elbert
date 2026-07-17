@@ -151,7 +151,7 @@ export default function Study({ deckId }: StudyProps) {
 
   return (
     <div className="screen study-screen">
-      <div className="study-remaining">{sessionRef.current!.remaining() + 1} left</div>
+      <div className="study-remaining">{sessionRef.current!.remaining()} left</div>
       <button className="study-card-tap" onClick={reveal} disabled={phase === 'back'}>
         <CardFace note={note} ord={card.ord} revealed={phase === 'back'} />
       </button>

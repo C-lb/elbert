@@ -1,9 +1,10 @@
 import 'fake-indexeddb/auto'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { db } from '@/data/db'
-import { repo } from '@/data/repo'
+import { repo, setMutationListener } from '@/data/repo'
 import { saveSettings } from '@/lib/settings'
 import { sync } from './client'
+import { scheduleSync } from './status'
 
 beforeEach(async () => {
   await Promise.all(db.tables.map(t => t.clear()))
@@ -308,5 +309,169 @@ describe('sync()', () => {
     expect(stored!.blob).toBeInstanceOf(Blob)
     expect(await stored!.blob!.text()).toBe(content)
     expect(stored!.dirty).toBe(0)
+  })
+})
+
+describe('mutation-triggered debounced sync', () => {
+  afterEach(() => {
+    setMutationListener(null)
+    vi.clearAllTimers()
+    vi.useRealTimers()
+  })
+
+  it('a burst of repo mutations coalesces into a single push after the debounce window', async () => {
+    const fetchSpy = vi.fn(async () => ({ ok: true, status: 200, json: async () => emptyPullResponse() }))
+    vi.stubGlobal('fetch', fetchSpy)
+
+    // Only fake the timer APIs the debounce uses — fake-indexeddb must keep its own scheduling.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    setMutationListener(scheduleSync)
+
+    await repo.put('decks', {
+      id: 'd1', name: 'One', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null,
+    })
+    await vi.advanceTimersByTimeAsync(2000)
+    await repo.put('decks', {
+      id: 'd2', name: 'Two', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null,
+    })
+    await repo.put('decks', {
+      id: 'd3', name: 'Three', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null,
+    })
+
+    // 2s after the first mutation, 0s after the last: trailing debounce, nothing fired yet.
+    expect(fetchSpy).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(4000)
+    vi.useRealTimers()
+    await vi.waitFor(() => expect(fetchSpy).toHaveBeenCalledTimes(1))
+
+    const body = JSON.parse((fetchSpy.mock.calls[0] as any)[1].body)
+    expect(body.push).toHaveLength(1)
+    expect(body.push[0].table).toBe('decks')
+    expect(body.push[0].rows.map((r: any) => r.id).sort()).toEqual(['d1', 'd2', 'd3'])
+
+    await vi.waitFor(async () => {
+      const rows = await db.decks.toArray()
+      expect(rows.every(r => r.dirty === 0)).toBe(true)
+    })
+  })
+
+  it('mutation-scheduled sync with no key configured stays a silent no-op', async () => {
+    await saveSettings({ syncKey: '' })
+    const fetchSpy = vi.fn()
+    vi.stubGlobal('fetch', fetchSpy)
+
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    setMutationListener(scheduleSync)
+
+    await repo.put('decks', {
+      id: 'd1', name: 'One', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null,
+    })
+    await vi.advanceTimersByTimeAsync(5000)
+    vi.useRealTimers()
+    await new Promise(r => setTimeout(r, 25))
+
+    expect(fetchSpy).not.toHaveBeenCalled()
+    const row = await db.decks.get('d1')
+    expect(row!.dirty).toBe(1)
+  })
+})
+
+describe('payload batching', () => {
+  it('splits an over-budget push into sequential requests, chaining each response cursor into the next', async () => {
+    // Two ~1.8MB blobs -> ~2.4MB of base64 each: together over the 3.5MB budget, so two requests.
+    const makeBlob = (fill: number) =>
+      new Blob([new Uint8Array(1_800_000).fill(fill)], { type: 'application/octet-stream' })
+    await repo.put('media', { id: 'm1', hash: 'h1', mime: 'application/octet-stream', blob: makeBlob(1), deletedAt: null })
+    await repo.put('media', { id: 'm2', hash: 'h2', mime: 'application/octet-stream', blob: makeBlob(2), deletedAt: null })
+
+    const bodies: any[] = []
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init: RequestInit) => {
+      bodies.push(JSON.parse(init.body as string))
+      return {
+        ok: true,
+        status: 200,
+        json: async () => emptyPullResponse(bodies.length === 1 ? 10 : 20),
+      }
+    }))
+
+    const result = await sync()
+
+    expect(result).toEqual({ pushed: 2, pulled: 0 })
+    expect(bodies).toHaveLength(2)
+
+    // Each request stays under the budget (allow slack for the {push, cursor} envelope).
+    for (const body of bodies) {
+      expect(JSON.stringify(body).length).toBeLessThan(3_600_000)
+    }
+
+    // Both rows went out exactly once, split across the two requests.
+    const pushedIds = bodies.flatMap(b => b.push.flatMap((p: any) => p.rows.map((r: any) => r.id)))
+    expect(pushedIds.sort()).toEqual(['m1', 'm2'])
+
+    // Cursor chaining: first request uses the stored cursor, second uses the first response's.
+    expect(bodies[0].cursor).toBe(0)
+    expect(bodies[1].cursor).toBe(10)
+    expect(await repo.getMeta('syncCursor')).toBe(20)
+
+    const m1 = await db.media.get('m1')
+    const m2 = await db.media.get('m2')
+    expect(m1!.dirty).toBe(0)
+    expect(m2!.dirty).toBe(0)
+  })
+
+  it('skips a single row whose own payload exceeds the limit, pushes the rest, and leaves it dirty', async () => {
+    // ~3MB blob -> ~4MB base64: alone over the 3.5MB budget.
+    const huge = new Blob([new Uint8Array(3_000_000)], { type: 'application/octet-stream' })
+    await repo.put('media', { id: 'mBig', hash: 'hb', mime: 'application/octet-stream', blob: huge, deletedAt: null })
+    await repo.put('decks', {
+      id: 'd1', name: 'Spanish', parentId: null, newPerDay: 15, desiredRetention: 0.9, deletedAt: null,
+    })
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const bodies: any[] = []
+    vi.stubGlobal('fetch', vi.fn(async (_url: string, init: RequestInit) => {
+      bodies.push(JSON.parse(init.body as string))
+      return { ok: true, status: 200, json: async () => emptyPullResponse(7) }
+    }))
+
+    const result = await sync()
+
+    expect(result).toEqual({ pushed: 1, pulled: 0, skipped: 1 })
+    expect(bodies).toHaveLength(1)
+    const pushedIds = bodies[0].push.flatMap((p: any) => p.rows.map((r: any) => r.id))
+    expect(pushedIds).toEqual(['d1'])
+    expect(warnSpy).toHaveBeenCalledOnce()
+    expect(String(warnSpy.mock.calls[0][0])).toContain('mBig')
+
+    // The oversized row stays dirty (visible as pending in the sync badge); everything else cleared.
+    expect((await db.media.get('mBig'))!.dirty).toBe(1)
+    expect((await db.decks.get('d1'))!.dirty).toBe(0)
+    expect(await repo.getMeta('syncCursor')).toBe(7)
+
+    warnSpy.mockRestore()
+  })
+
+  it('a failed later batch keeps its rows dirty while earlier committed batches stay cleared', async () => {
+    const makeBlob = (fill: number) =>
+      new Blob([new Uint8Array(1_800_000).fill(fill)], { type: 'application/octet-stream' })
+    await repo.put('media', { id: 'm1', hash: 'h1', mime: 'application/octet-stream', blob: makeBlob(1), deletedAt: null })
+    await repo.put('media', { id: 'm2', hash: 'h2', mime: 'application/octet-stream', blob: makeBlob(2), deletedAt: null })
+
+    let call = 0
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      call++
+      if (call === 1) return { ok: true, status: 200, json: async () => emptyPullResponse(10) }
+      throw new Error('offline')
+    }))
+
+    const result = await sync()
+
+    expect(result).toEqual({ error: 'network error' })
+    // Batch 1 committed: its row is on the server, dirty cleared, cursor advanced.
+    expect((await db.media.get('m1'))!.dirty).toBe(0)
+    expect(await repo.getMeta('syncCursor')).toBe(10)
+    // Batch 2 failed: its row stays dirty for the next sync.
+    expect((await db.media.get('m2'))!.dirty).toBe(1)
   })
 })

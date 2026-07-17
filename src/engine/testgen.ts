@@ -112,9 +112,9 @@ function shuffle<T>(arr: T[], rng: () => number): T[] {
   return a
 }
 
-/** The lowest cloze ordinal in a note's term text, defaulting to 1 for non-cloze notes. */
+/** The lowest cloze ordinal in a note's term text, or 0 (the term->definition card) for non-cloze notes. */
 function firstOrd(note: Note): number {
-  if (note.type !== 'cloze') return 1
+  if (note.type !== 'cloze') return 0
   const ords = parseCloze(note.fields.term)
   return ords[0]?.ord ?? 1
 }

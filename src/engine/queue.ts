@@ -2,7 +2,8 @@ import { db } from '@/data/db'
 import { repo } from '@/data/repo'
 import type { Card, Deck } from '@/data/types'
 
-const dayKey = () => new Date().toISOString().slice(0, 10)
+export const dayKey = (d: Date = new Date()) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const counterKey = (deckId: string) => `newIntroduced:${deckId}:${dayKey()}`
 
 async function deletedNoteIds(): Promise<Set<string>> {
@@ -42,20 +43,45 @@ async function newAllowance(deckId: string): Promise<number> {
   return Math.max(0, deck.newPerDay - introduced)
 }
 
-export async function dueCounts(deckId?: string): Promise<{ due: number; newAvailable: number }> {
-  const now = Date.now()
-  const cards = await eligibleCards(deckId)
-  const due = cards.filter(c => c.state !== 0 && c.due <= now).length
-
-  const decks = await liveDecks(deckId)
-  let newAvailable = 0
+export async function dueCountsAll(now = Date.now()): Promise<Map<string, { due: number; newAvailable: number }>> {
+  const decks = await liveDecks()
+  const cards = await eligibleCards()
   const noteById = new Map((await db.notes.toArray()).map(n => [n.id, n]))
+
+  const counts = new Map<string, { due: number; newAvailable: number }>()
+  const newInDeck = new Map<string, number>()
   for (const deck of decks) {
-    const allowance = await newAllowance(deck.id)
-    const newInDeck = cards.filter(c => c.state === 0 && noteById.get(c.noteId)?.deckId === deck.id).length
-    newAvailable += Math.min(allowance, newInDeck)
+    counts.set(deck.id, { due: 0, newAvailable: 0 })
+    newInDeck.set(deck.id, 0)
   }
 
+  for (const c of cards) {
+    const deckId = noteById.get(c.noteId)?.deckId
+    if (deckId == null) continue
+    const entry = counts.get(deckId)
+    if (!entry) continue
+    if (c.state === 0) newInDeck.set(deckId, (newInDeck.get(deckId) ?? 0) + 1)
+    else if (c.due <= now) entry.due += 1
+  }
+
+  for (const deck of decks) {
+    const introduced = (await repo.getMeta<number>(counterKey(deck.id))) ?? 0
+    const allowance = Math.max(0, deck.newPerDay - introduced)
+    counts.get(deck.id)!.newAvailable = Math.min(allowance, newInDeck.get(deck.id) ?? 0)
+  }
+
+  return counts
+}
+
+export async function dueCounts(deckId?: string): Promise<{ due: number; newAvailable: number }> {
+  const all = await dueCountsAll()
+  if (deckId) return all.get(deckId) ?? { due: 0, newAvailable: 0 }
+  let due = 0
+  let newAvailable = 0
+  for (const entry of all.values()) {
+    due += entry.due
+    newAvailable += entry.newAvailable
+  }
   return { due, newAvailable }
 }
 

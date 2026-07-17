@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { createLearnSession } from './learn'
+import { answerForNote, createLearnSession } from './learn'
 import type { Card, Note } from '@/data/types'
 
 function mulberry32(seed: number): () => number {
@@ -46,6 +46,29 @@ function makeCard(note: Note, overrides: Partial<Card> = {}): Card {
     ...overrides,
   }
 }
+
+describe('answerForNote', () => {
+  it('returns the definition for a basic note regardless of ord', () => {
+    const note = makeNote('perro')
+    expect(answerForNote(note, makeCard(note, { ord: 0 }))).toBe('perro')
+  })
+
+  it('returns the definition for the ord-0 card of a basic_reversed note', () => {
+    const note = makeNote('perro', { type: 'basic_reversed' })
+    expect(answerForNote(note, makeCard(note, { ord: 0 }))).toBe('perro')
+  })
+
+  it('returns the term for the ord-1 (reversed) card of a basic_reversed note', () => {
+    const note = makeNote('perro', { type: 'basic_reversed' })
+    expect(answerForNote(note, makeCard(note, { ord: 1 }))).toBe(note.fields.term)
+  })
+
+  it('returns the blanked cloze span for a cloze note', () => {
+    const note = makeNote('', { type: 'cloze', fields: { term: '{{c1::hola}} {{c2::mundo}}', definition: '' } })
+    expect(answerForNote(note, makeCard(note, { ord: 1 }))).toBe('hola')
+    expect(answerForNote(note, makeCard(note, { ord: 2 }))).toBe('mundo')
+  })
+})
 
 describe('createLearnSession', () => {
   it('clears a card only after passing both round 1 (mc) and round 2 (typed)', () => {
@@ -211,6 +234,31 @@ describe('createLearnSession', () => {
     expect(step.choices!.length).toBe(2)
     const correctAnswer = notes.find(n => n.id === step.card.noteId)!.fields.definition
     expect(step.choices).toContain(correctAnswer)
+  })
+
+  it('draws distractors only from the same side for basic_reversed decks', () => {
+    // Reversed vocab deck: ord-0 cards ask term->definition, ord-1 the reverse.
+    // A definition question must never offer terms as options, and vice versa.
+    const pairs = [
+      ['perro', 'dog'],
+      ['gato', 'cat'],
+      ['pajaro', 'bird'],
+      ['pez', 'fish'],
+    ] as const
+    const notes = pairs.map(([term, def]) =>
+      makeNote(def, { type: 'basic_reversed', fields: { term, definition: def } })
+    )
+    const cards = notes.flatMap(n => [makeCard(n, { ord: 0 }), makeCard(n, { ord: 1 })])
+    const terms = new Set<string>(pairs.map(p => p[0]))
+    const defs = new Set<string>(pairs.map(p => p[1]))
+
+    const session = createLearnSession(cards, notes, { rng: mulberry32(9) })
+    for (let i = 0; i < cards.length; i++) {
+      const step = session.next()!
+      const sameSide = step.card.ord === 1 ? terms : defs
+      for (const choice of step.choices!) expect(sameSide.has(choice)).toBe(true)
+      session.answerMc(true)
+    }
   })
 
   it('fires onDueReview exactly once for a due card that clears both rounds', () => {

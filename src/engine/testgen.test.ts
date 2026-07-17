@@ -45,6 +45,13 @@ function bigDeck(n: number): Note[] {
 }
 
 describe('generateTest', () => {
+  it('basic_reversed notes still test term -> definition', () => {
+    const notes = [makeNote('hola', 'hello', { type: 'basic_reversed' })]
+    const paper = generateTest(notes, { written: 1, mc: 0, tf: 0, matching: 0 }, mulberry32(1))
+    expect(paper.written[0].prompt).toBe('hola')
+    expect(paper.written[0].answer).toBe('hello')
+  })
+
   it('honors requested section counts when the deck is large enough', () => {
     const notes = bigDeck(20)
     const paper = generateTest(notes, { written: 3, mc: 4, tf: 5, matching: 6 }, mulberry32(1))
