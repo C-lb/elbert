@@ -22,12 +22,14 @@ async function eligibleCards(deckId?: string): Promise<Card[]> {
   const deadNotes = await deletedNoteIds()
   const cards = await db.cards.toArray()
   const noteById = new Map((await db.notes.toArray()).map(n => [n.id, n]))
+  const deadDecks = new Set((await db.decks.filter(d => d.deletedAt != null).toArray()).map(d => d.id))
   return cards.filter(c => {
     if (c.deletedAt != null) return false
     if (c.suspended === 1) return false
     if (deadNotes.has(c.noteId)) return false
     const note = noteById.get(c.noteId)
     if (!note) return false
+    if (deadDecks.has(note.deckId)) return false
     if (deckId && note.deckId !== deckId) return false
     return true
   })
