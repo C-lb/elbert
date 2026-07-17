@@ -6,6 +6,7 @@ import QuickCapture from '@/components/QuickCapture'
 interface HomeProps {
   onStudy: (deckId?: string) => void
   onOpenDeck: (deckId: string) => void
+  onImport: () => void
 }
 
 function PlusIcon() {
@@ -16,7 +17,7 @@ function PlusIcon() {
   )
 }
 
-export default function Home({ onStudy, onOpenDeck }: HomeProps) {
+export default function Home({ onStudy, onOpenDeck, onImport }: HomeProps) {
   const [due, setDue] = useState<number | null>(null)
   const [capturing, setCapturing] = useState(false)
   const [toast, setToast] = useState(false)
@@ -42,6 +43,12 @@ export default function Home({ onStudy, onOpenDeck }: HomeProps) {
         <div className="due-label">cards due today</div>
         <button className="btn btn-accent btn-block" onClick={() => onStudy()}>
           Study now
+        </button>
+      </div>
+
+      <div className="import-link-row">
+        <button className="btn btn-sm" onClick={onImport}>
+          Import
         </button>
       </div>
 

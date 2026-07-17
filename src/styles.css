@@ -109,6 +109,8 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
 
 .btn-block { width: 100%; }
 
+.btn-sm { padding: 8px 16px; min-height: 36px; border-radius: 10px; font-weight: 500; }
+
 .btn-icon {
   width: 48px; height: 48px; padding: 0;
   display: flex; align-items: center; justify-content: center;
@@ -542,3 +544,30 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
   border: 1px solid var(--stroke);
   display: flex; flex-direction: column; gap: var(--s1);
 }
+
+/* import screen */
+.import-link-row { display: flex; justify-content: flex-end; }
+.import-tabs { display: flex; gap: var(--s2); }
+.import-tab { flex: 1; }
+.import-tab-active { background: var(--surface-2); color: var(--ink); border-color: var(--ink-3); }
+.import-textarea {
+  min-height: 160px;
+  padding: var(--s3);
+  resize: vertical;
+  line-height: 1.5;
+}
+.import-error { color: var(--danger); }
+.import-preview { display: flex; flex-direction: column; gap: var(--s2); }
+.import-preview-table {
+  border-radius: 12px;
+  border: 1px solid var(--stroke);
+  overflow: hidden;
+}
+.import-preview-row {
+  display: flex;
+  gap: var(--s3);
+  padding: var(--s2) var(--s3);
+}
+.import-preview-row + .import-preview-row { border-top: 1px solid var(--stroke); }
+.import-preview-term { flex: 1; color: var(--ink); font-weight: 500; }
+.import-preview-def { flex: 1; color: var(--ink-2); }

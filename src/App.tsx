@@ -8,10 +8,11 @@ import TestMode from '@/screens/TestMode'
 import Match from '@/screens/Match'
 import Editor from '@/screens/Editor'
 import DeckSettings from '@/screens/DeckSettings'
+import Import from '@/screens/Import'
 import { requestSync, useSyncStatus } from '@/sync/status'
 
 interface Route {
-  name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'deck' | 'settings'
+  name: 'home' | 'study' | 'learn' | 'test' | 'match' | 'edit' | 'deck' | 'settings' | 'import'
   deckId?: string
 }
 
@@ -36,6 +37,8 @@ function parseHash(hash: string): Route {
       return { name: 'deck', deckId: param }
     case 'settings':
       return { name: 'settings' }
+    case 'import':
+      return { name: 'import' }
     default:
       return { name: 'home' }
   }
@@ -74,6 +77,7 @@ const TITLES: Record<Route['name'], string> = {
   edit: 'Edit deck',
   deck: 'Deck settings',
   settings: 'Settings',
+  import: 'Import',
 }
 
 function App() {
@@ -93,10 +97,13 @@ function App() {
           <Home
             onStudy={deckId => navigate(deckId ? `#/study/${deckId}` : '#/study')}
             onOpenDeck={deckId => navigate(`#/study/${deckId}`)}
+            onImport={() => navigate('#/import')}
           />
         )
       case 'settings':
         return <Settings />
+      case 'import':
+        return <Import />
       case 'study':
         return <Study deckId={route.deckId} />
       case 'learn':
