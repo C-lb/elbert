@@ -460,6 +460,15 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
 .stepper-btn { min-width: 48px; padding: 12px; font-size: 1.1em; font-weight: 700; }
 .stepper-value { color: var(--ink); font-weight: 600; min-width: 1.5em; text-align: center; }
 
+.btn-tf-true:hover, .btn-tf-true:focus-visible, .btn-tf-true-selected {
+  background: var(--success-soft); color: var(--success); border-color: var(--success);
+}
+.btn-tf-true:focus-visible { outline-color: var(--success); }
+.btn-tf-false:hover, .btn-tf-false:focus-visible, .btn-tf-false-selected {
+  background: var(--danger-soft); color: var(--danger); border-color: var(--danger);
+}
+.btn-tf-false:focus-visible { outline-color: var(--danger); }
+
 .test-paper { gap: var(--s6); }
 .test-section { display: flex; flex-direction: column; gap: var(--s4); }
 .test-question { display: flex; flex-direction: column; gap: var(--s2); }

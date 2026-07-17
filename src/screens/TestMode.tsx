@@ -210,14 +210,14 @@ export default function TestMode({ deckId }: TestModeProps) {
                 <div className="learn-close-actions">
                   <button
                     type="button"
-                    className={`btn ${answers.tf[q.id] === true ? 'btn-accent' : ''}`}
+                    className={`btn btn-tf-true ${answers.tf[q.id] === true ? 'btn-tf-true-selected' : ''}`}
                     onClick={() => setTf(q.id, true)}
                   >
                     True
                   </button>
                   <button
                     type="button"
-                    className={`btn ${answers.tf[q.id] === false ? 'btn-accent' : ''}`}
+                    className={`btn btn-tf-false ${answers.tf[q.id] === false ? 'btn-tf-false-selected' : ''}`}
                     onClick={() => setTf(q.id, false)}
                   >
                     False
