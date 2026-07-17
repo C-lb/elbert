@@ -13,3 +13,11 @@ export function renderCloze(text: string, ord: number, revealed: boolean) {
   return text.replace(RE, (_, n, answer, hint) =>
     Number(n) === ord && !revealed ? `[${hint ?? '...'}]` : answer)
 }
+
+/** The answer text for a given cloze ordinal (the blanked-out span). */
+export function clozeAnswer(text: string, ord: number): string {
+  for (const m of text.matchAll(RE)) {
+    if (Number(m[1]) === ord) return m[2]
+  }
+  return ''
+}

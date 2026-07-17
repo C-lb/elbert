@@ -3,6 +3,7 @@ import Nav from '@/components/Nav'
 import Home from '@/screens/Home'
 import Settings from '@/screens/Settings'
 import Study from '@/screens/Study'
+import Learn from '@/screens/Learn'
 import Editor from '@/screens/Editor'
 import DeckSettings from '@/screens/DeckSettings'
 import { requestSync, useSyncStatus } from '@/sync/status'
@@ -97,7 +98,7 @@ function App() {
       case 'study':
         return <Study deckId={route.deckId} />
       case 'learn':
-        return <NotBuilt label="Learn mode" />
+        return <Learn deckId={route.deckId} />
       case 'test':
         return <NotBuilt label="Test mode" />
       case 'match':
