@@ -146,21 +146,21 @@ function answerText(note: Note, ord: number): string {
   return answerForNote(note, pseudoCard(note, ord))
 }
 
-function buildWritten(note: Note, i: number): WrittenQuestion {
+function buildWritten(note: Note, answerByNoteId: Map<string, string>, i: number): WrittenQuestion {
   const ord = firstOrd(note)
   return {
     id: `w-${i}`,
     type: 'written',
     noteId: note.id,
     prompt: termText(note, ord),
-    answer: answerText(note, ord),
+    answer: answerByNoteId.get(note.id)!,
   }
 }
 
-function buildMc(note: Note, allNotes: Note[], i: number, rng: () => number): McQuestion {
+function buildMc(note: Note, allNotes: Note[], answerByNoteId: Map<string, string>, i: number, rng: () => number): McQuestion {
   const ord = firstOrd(note)
-  const correct = answerText(note, ord)
-  const otherAnswers = [...new Set(allNotes.filter(n => n.id !== note.id).map(n => answerText(n, firstOrd(n))))].filter(
+  const correct = answerByNoteId.get(note.id)!
+  const otherAnswers = [...new Set(allNotes.filter(n => n.id !== note.id).map(n => answerByNoteId.get(n.id)!))].filter(
     a => a !== correct
   )
   const distractors = shuffle(otherAnswers, rng).slice(0, 3)
@@ -175,11 +175,13 @@ function buildMc(note: Note, allNotes: Note[], i: number, rng: () => number): Mc
   }
 }
 
-function buildTf(note: Note, allNotes: Note[], i: number, rng: () => number): TfQuestion {
+function buildTf(note: Note, allNotes: Note[], answerByNoteId: Map<string, string>, i: number, rng: () => number): TfQuestion {
   const ord = firstOrd(note)
   const term = termText(note, ord)
-  const ownDefinition = answerText(note, ord)
-  const others = allNotes.filter(n => n.id !== note.id)
+  const ownDefinition = answerByNoteId.get(note.id)!
+  // Exclude other notes whose answer text is identical to this note's own definition:
+  // a "false" pairing must actually be false, not a duplicate that reads as true.
+  const others = allNotes.filter(n => n.id !== note.id && answerByNoteId.get(n.id)! !== ownDefinition)
   const wantTrue = rng() < 0.5 || others.length === 0
 
   if (wantTrue) {
@@ -187,25 +189,24 @@ function buildTf(note: Note, allNotes: Note[], i: number, rng: () => number): Tf
   }
 
   const other = others[Math.floor(rng() * others.length)]
-  const otherOrd = firstOrd(other)
   return {
     id: `tf-${i}`,
     type: 'tf',
     noteId: note.id,
     term,
-    definition: answerText(other, otherOrd),
+    definition: answerByNoteId.get(other.id)!,
     isTrue: false,
     definitionNoteId: other.id,
   }
 }
 
-function buildMatching(notes: Note[], count: number, rng: () => number): MatchingSection | null {
+function buildMatching(notes: Note[], answerByNoteId: Map<string, string>, count: number, rng: () => number): MatchingSection | null {
   const n = Math.min(count, notes.length)
   if (n <= 0) return null
   const chosen = shuffle(notes, rng).slice(0, n)
   const pairs = chosen.map(note => {
     const ord = firstOrd(note)
-    return { noteId: note.id, term: termText(note, ord), definition: answerText(note, ord) }
+    return { noteId: note.id, term: termText(note, ord), definition: answerByNoteId.get(note.id)! }
   })
   return {
     id: 'matching',
@@ -216,16 +217,18 @@ function buildMatching(notes: Note[], count: number, rng: () => number): Matchin
 }
 
 export function generateTest(notes: Note[], counts: TestCounts, rng: () => number): TestPaper {
+  const answerByNoteId = new Map(notes.map(n => [n.id, answerText(n, firstOrd(n))]))
+
   const writtenPool = shuffle(notes, rng).slice(0, Math.max(0, Math.min(counts.written, notes.length)))
-  const written = writtenPool.map((note, i) => buildWritten(note, i))
+  const written = writtenPool.map((note, i) => buildWritten(note, answerByNoteId, i))
 
   const mcPool = shuffle(notes, rng).slice(0, Math.max(0, Math.min(counts.mc, notes.length)))
-  const mc = mcPool.map((note, i) => buildMc(note, notes, i, rng))
+  const mc = mcPool.map((note, i) => buildMc(note, notes, answerByNoteId, i, rng))
 
   const tfPool = shuffle(notes, rng).slice(0, Math.max(0, Math.min(counts.tf, notes.length)))
-  const tf = tfPool.map((note, i) => buildTf(note, notes, i, rng))
+  const tf = tfPool.map((note, i) => buildTf(note, notes, answerByNoteId, i, rng))
 
-  const matching = buildMatching(notes, counts.matching, rng)
+  const matching = buildMatching(notes, answerByNoteId, counts.matching, rng)
 
   return { written, mc, tf, matching }
 }

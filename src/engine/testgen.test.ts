@@ -146,6 +146,35 @@ describe('generateTest', () => {
     }
   })
 
+  it('tf false pairings never show a definition identical to the note\'s own, even when the deck has duplicate definition text', () => {
+    // Every note shares the exact same definition text, so no genuinely-false pairing exists.
+    const notes = Array.from({ length: 8 }, (_, i) => makeNote(`term-${i}`, 'same-definition'))
+    const paper = generateTest(notes, { written: 0, mc: 0, tf: 8, matching: 0 }, mulberry32(13))
+    for (const q of paper.tf) {
+      // With no other note offering a distinct definition, every question must fall back to true.
+      expect(q.isTrue).toBe(true)
+      expect(q.definitionNoteId).toBe(q.noteId)
+    }
+  })
+
+  it('tf false pairings exclude notes whose definition duplicates the term\'s own, even amid other distinct notes', () => {
+    const target = makeNote('term-target', 'shared-definition')
+    const duplicate = makeNote('term-duplicate', 'shared-definition')
+    const distinctNotes = Array.from({ length: 6 }, (_, i) => makeNote(`term-distinct-${i}`, `distinct-definition-${i}`))
+    const notes = [target, duplicate, ...distinctNotes]
+
+    // Run many seeds so both true and false branches for `target` get exercised.
+    for (let seed = 1; seed <= 30; seed++) {
+      const paper = generateTest(notes, { written: 0, mc: 0, tf: 8, matching: 0 }, mulberry32(seed))
+      const q = paper.tf.find(q => q.noteId === target.id)
+      if (!q) continue
+      if (!q.isTrue) {
+        expect(q.definitionNoteId).not.toBe(duplicate.id)
+        expect(q.definition).not.toBe(target.fields.definition)
+      }
+    }
+  })
+
   it('written prompt/answer for a cloze note blanks the term and answers with the deletion', () => {
     const notes = [makeCloze('The capital of France is {{c1::Paris}}.')]
     const paper = generateTest(notes, { written: 1, mc: 0, tf: 0, matching: 0 }, mulberry32(11))
