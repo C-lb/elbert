@@ -571,3 +571,39 @@ h1, h2, h3 { color: var(--ink); font-weight: 600; margin: 0; }
 .import-preview-row + .import-preview-row { border-top: 1px solid var(--stroke); }
 .import-preview-term { flex: 1; color: var(--ink); font-weight: 500; }
 .import-preview-def { flex: 1; color: var(--ink-2); }
+
+/* generate screen */
+.btn-loading { display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); }
+.spinner {
+  width: 16px; height: 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(244, 244, 245, 0.3);
+  border-top-color: currentColor;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.draft-list { display: flex; flex-direction: column; gap: var(--s3); }
+.draft-row {
+  background: var(--surface-1);
+  border: 1px solid var(--stroke);
+  border-radius: 14px;
+  padding: var(--s3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.draft-row-off { opacity: 0.5; }
+.draft-row-head { display: flex; align-items: center; justify-content: space-between; }
+.draft-checkbox { display: flex; align-items: center; min-height: 48px; }
+.draft-checkbox input { width: 20px; height: 20px; }
+.draft-badge {
+  font-size: 0.85em; font-weight: 600;
+  color: var(--ink-2);
+  background: var(--surface-2);
+  border-radius: 999px;
+  padding: var(--s1) var(--s3);
+}
+.draft-field { min-height: 44px; }
+.draft-actions { display: flex; gap: var(--s2); align-items: stretch; }
+.draft-actions .btn-block { flex: 1; }

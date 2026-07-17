@@ -7,6 +7,7 @@ interface HomeProps {
   onStudy: (deckId?: string) => void
   onOpenDeck: (deckId: string) => void
   onImport: () => void
+  onGenerate: () => void
 }
 
 function PlusIcon() {
@@ -17,7 +18,7 @@ function PlusIcon() {
   )
 }
 
-export default function Home({ onStudy, onOpenDeck, onImport }: HomeProps) {
+export default function Home({ onStudy, onOpenDeck, onImport, onGenerate }: HomeProps) {
   const [due, setDue] = useState<number | null>(null)
   const [capturing, setCapturing] = useState(false)
   const [toast, setToast] = useState(false)
@@ -47,6 +48,9 @@ export default function Home({ onStudy, onOpenDeck, onImport }: HomeProps) {
       </div>
 
       <div className="import-link-row">
+        <button className="btn btn-sm" onClick={onGenerate}>
+          Generate with AI
+        </button>
         <button className="btn btn-sm" onClick={onImport}>
           Import
         </button>
