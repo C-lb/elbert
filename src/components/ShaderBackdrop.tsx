@@ -36,8 +36,8 @@ export default function ShaderBackdrop({ deckId }: ShaderBackdropProps) {
 
   useEffect(() => {
     let cancelled = false
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reducedMotion) return
+    // The gradient shows regardless of prefers-reduced-motion — it's a wanted
+    // visual, not incidental motion, so we don't gate it on the OS setting.
     getSettings().then(settings => {
       if (!cancelled && settings.shaderEnabled) setAllowed(true)
     })

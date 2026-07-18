@@ -45,7 +45,7 @@ export default function ShaderGradientInner({ deckId }: ShaderGradientInnerProps
         color1={preset.color1}
         color2={preset.color2}
         color3={preset.color3}
-        brightness={0.85}
+        brightness={1.1}
         reflection={0.08}
         grain="off"
         lightType="env"
