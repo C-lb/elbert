@@ -8,14 +8,22 @@
 
 /* Begin PBXBuildFile section */
 		07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52B715D527791D66B8B78C6 /* ElbertUITests.swift */; };
+		1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BF213188459A5C1BBB44AA /* ModelsTests.swift */; };
 		1D9A490A881552337C9F124A /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A332AEF634FF9758F7A5DF20 /* Buttons.swift */; };
 		3BB50B1455929D5ADB5DDAF9 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA04ED33542FCF20E3D5343 /* Feedback.swift */; };
+		4175C333970EA3210273F9BC /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F363816233BAFC1E3359D50 /* Deck.swift */; };
 		52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */; };
 		567703E5CF0B7C1371CB2E9C /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2E2E2EF0E6E14538CA5D10 /* Icons.swift */; };
 		5E086AFD438D3A93E385A912 /* DesignGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0C274950BE16D9C5FD03C5 /* DesignGallery.swift */; };
+		625C4F2D7956947EC42FD657 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = D574077B80F4101BBADF7F4A /* Persistence.swift */; };
 		65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E7A2E10B27330E83314BDB /* ElbertApp.swift */; };
+		69C20D6616E2BE848262F730 /* MediaAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7820516C33491D483706A7AC /* MediaAsset.swift */; };
+		7A03126B46C15805D2D918F7 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2389E116B6171C4F8ABAD15E /* Note.swift */; };
+		7EA1F2FA24A68D335B55467A /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710FA75DDD0CB5C29976B81 /* Enums.swift */; };
 		842E5311EA48BFB3547FEBD6 /* DMSans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BEC558650956D409A959140F /* DMSans.ttf */; };
+		89026FC8EC39DBFF16D1D5BC /* Review.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF15A0AC138CED597573830 /* Review.swift */; };
 		9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */; };
+		D695BA23B249C10C83209B97 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 004477F5E274521831ABE4CA /* Card.swift */; };
 		DF896C3BD47A0C5110EC53BF /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFB9CA951FE21A831C31F1 /* Typography.swift */; };
 		F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEF47AD555DC9FDFA26DA12 /* Theme.swift */; };
 		F74066CD6142ED8CA4510EC3 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = FF0D51918099DC4CB23C122E /* FSRS */; };
@@ -39,12 +47,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		004477F5E274521831ABE4CA /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		0FEFB9CA951FE21A831C31F1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		1BA04ED33542FCF20E3D5343 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
+		1EF15A0AC138CED597573830 /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
 		1FAAC81112D995D76EF6B27E /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		2389E116B6171C4F8ABAD15E /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		25BF213188459A5C1BBB44AA /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 		52E7A2E10B27330E83314BDB /* ElbertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertApp.swift; sourceTree = "<group>"; };
+		5710FA75DDD0CB5C29976B81 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		7820516C33491D483706A7AC /* MediaAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaAsset.swift; sourceTree = "<group>"; };
 		7F0C274950BE16D9C5FD03C5 /* DesignGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignGallery.swift; sourceTree = "<group>"; };
+		7F363816233BAFC1E3359D50 /* Deck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deck.swift; sourceTree = "<group>"; };
 		80195AAAEE079FF0154B2DA5 /* ElbertUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		87B26974EF8AF821EF15AAB4 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		8D2E2E2EF0E6E14538CA5D10 /* Icons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Icons.swift; sourceTree = "<group>"; };
@@ -56,6 +71,7 @@
 		BEC558650956D409A959140F /* DMSans.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DMSans.ttf; sourceTree = "<group>"; };
 		D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B715D527791D66B8B78C6 /* ElbertUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertUITests.swift; sourceTree = "<group>"; };
+		D574077B80F4101BBADF7F4A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		E7C389F69D8800A969A18FEF /* Elbert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Elbert.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -76,6 +92,7 @@
 			children = (
 				01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */,
 				9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */,
+				25BF213188459A5C1BBB44AA /* ModelsTests.swift */,
 			);
 			path = ElbertTests;
 			sourceTree = "<group>";
@@ -109,6 +126,13 @@
 			isa = PBXGroup;
 			children = (
 				A1971F822C159FCBA0FAD731 /* .gitkeep */,
+				004477F5E274521831ABE4CA /* Card.swift */,
+				7F363816233BAFC1E3359D50 /* Deck.swift */,
+				5710FA75DDD0CB5C29976B81 /* Enums.swift */,
+				7820516C33491D483706A7AC /* MediaAsset.swift */,
+				2389E116B6171C4F8ABAD15E /* Note.swift */,
+				D574077B80F4101BBADF7F4A /* Persistence.swift */,
+				1EF15A0AC138CED597573830 /* Review.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -316,10 +340,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D9A490A881552337C9F124A /* Buttons.swift in Sources */,
+				D695BA23B249C10C83209B97 /* Card.swift in Sources */,
+				4175C333970EA3210273F9BC /* Deck.swift in Sources */,
 				5E086AFD438D3A93E385A912 /* DesignGallery.swift in Sources */,
 				65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */,
+				7EA1F2FA24A68D335B55467A /* Enums.swift in Sources */,
 				3BB50B1455929D5ADB5DDAF9 /* Feedback.swift in Sources */,
 				567703E5CF0B7C1371CB2E9C /* Icons.swift in Sources */,
+				69C20D6616E2BE848262F730 /* MediaAsset.swift in Sources */,
+				7A03126B46C15805D2D918F7 /* Note.swift in Sources */,
+				625C4F2D7956947EC42FD657 /* Persistence.swift in Sources */,
+				89026FC8EC39DBFF16D1D5BC /* Review.swift in Sources */,
 				F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */,
 				DF896C3BD47A0C5110EC53BF /* Typography.swift in Sources */,
 			);
@@ -331,6 +362,7 @@
 			files = (
 				52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */,
 				9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */,
+				1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

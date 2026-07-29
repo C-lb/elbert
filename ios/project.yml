@@ -55,6 +55,12 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
+        # CloudKit is off until the iCloud container exists in the developer account
+        # (spec section 10, item 1). Signing against an unregistered container fails, so
+        # the entitlement cannot be attached early "just in case". To turn sync on,
+        # uncomment both lines below and regenerate with `xcodegen generate`.
+        # CODE_SIGN_ENTITLEMENTS: Elbert/Elbert.entitlements
+        # SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) ELBERT_CLOUDKIT"
 
   ElbertTests:
     type: bundle.unit-test
