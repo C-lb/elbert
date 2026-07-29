@@ -32,6 +32,7 @@ struct RootView: View {
                         // for the bar to hide.
                         .toolbar(.hidden, for: .navigationBar)
                         .toolbar(.hidden, for: .tabBar)
+                        .navigationDestination(for: DeckRoute.self, destination: destination)
                 }
                 .tag(tab)
             }
@@ -45,10 +46,21 @@ struct RootView: View {
         .environment(toasts)
     }
 
+    /// Routes are carried as deck ids rather than `Deck` objects, so a path that outlives the deck
+    /// it points at resolves to nothing instead of holding a deleted model alive.
+    @ViewBuilder
+    private func destination(_ route: DeckRoute) -> some View {
+        switch route {
+        case .notes(let id): DeckLoader(deckID: id) { DeckNotesScreen(deck: $0) }
+        case .settings(let id): DeckLoader(deckID: id) { DeckSettingsScreen(deck: $0) }
+        }
+    }
+
     @ViewBuilder
     private func screen(for tab: AppTab) -> some View {
         switch tab {
-        case .home: HomeScreen()
+        // Home's actions move you between tabs rather than pushing, so it needs the selection.
+        case .home: HomeScreen(selectedTab: $selection)
         case .decks: DeckListScreen()
         case .study: StudyScreen()
         case .settings: SettingsScreen()

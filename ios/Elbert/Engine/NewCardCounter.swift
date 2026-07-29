@@ -55,6 +55,17 @@ struct NewCardCounter {
         defaults.removeObject(forKey: Self.key(deckID: deckID, on: date))
     }
 
+    /// Forgets every deck's count, for every day.
+    ///
+    /// Used when the store is reset to sample data. Without it a seeded launch inherits whatever
+    /// allowance the previous one spent, so a walk or a UI test can find a freshly seeded deck
+    /// with nothing available to study.
+    func resetAll() {
+        for key in defaults.dictionaryRepresentation().keys where key.hasPrefix(Self.prefix) {
+            defaults.removeObject(forKey: key)
+        }
+    }
+
     private func pruneKeys(otherThan today: String) {
         for key in defaults.dictionaryRepresentation().keys
         where key.hasPrefix(Self.prefix) && !key.hasSuffix(":\(today)") {

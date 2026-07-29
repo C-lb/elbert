@@ -3,10 +3,6 @@ import XCTest
 final class ElbertUITests: XCTestCase {
     private let tabs = ["Home", "Decks", "Study", "Settings"]
 
-    /// Matches `ScreenID.title`. The tab bar caption and the screen heading carry the
-    /// same words, so querying by label alone is a coin toss between them.
-    private let titleIdentifier = "screen-title"
-
     private func launch() -> XCUIApplication {
         let app = XCUIApplication()
         app.launch()
@@ -14,7 +10,7 @@ final class ElbertUITests: XCTestCase {
     }
 
     private func heading(in app: XCUIApplication) -> XCUIElement {
-        app.staticTexts[titleIdentifier]
+        app.staticTexts[screenTitleIdentifier]
     }
 
     func testAppLaunches() {
@@ -31,12 +27,8 @@ final class ElbertUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 10))
 
         for tab in tabs {
-            app.buttons[tab].tap()
-
             // The screen changed: the heading now reads this tab's name.
-            let title = heading(in: app)
-            XCTAssertTrue(title.waitForExistence(timeout: 3), "\(tab) heading never appeared")
-            XCTAssertEqual(title.label, tab)
+            selectTab(app, tab, heading: tab)
 
             // Current state is carried as a real accessibility trait, not just a filled glyph, so
             // VoiceOver and the visual state cannot drift apart.
@@ -71,17 +63,9 @@ final class ElbertUITests: XCTestCase {
         let app = launch()
         XCTAssertTrue(app.buttons["Decks"].waitForExistence(timeout: 10))
 
-        app.buttons["Decks"].tap()
-        XCTAssertTrue(heading(in: app).waitForExistence(timeout: 3))
-        XCTAssertEqual(heading(in: app).label, "Decks")
-
-        app.buttons["Settings"].tap()
-        XCTAssertTrue(heading(in: app).waitForExistence(timeout: 3))
-        XCTAssertEqual(heading(in: app).label, "Settings")
-
-        app.buttons["Decks"].tap()
-        XCTAssertTrue(heading(in: app).waitForExistence(timeout: 3))
-        XCTAssertEqual(heading(in: app).label, "Decks")
+        selectTab(app, "Decks", heading: "Decks")
+        selectTab(app, "Settings", heading: "Settings")
+        selectTab(app, "Decks", heading: "Decks")
         XCTAssertTrue(app.buttons["Decks"].isSelected)
     }
 }

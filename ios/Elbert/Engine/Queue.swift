@@ -30,7 +30,13 @@ enum Queue {
         in context: ModelContext,
         deckID: UUID? = nil
     ) throws -> [Card] {
-        try context.fetch(FetchDescriptor<Card>()).filter { card in
+        eligible(cards: try context.fetch(FetchDescriptor<Card>()), deckID: deckID)
+    }
+
+    /// The same filter, over rows that have already been fetched. What a `@Query`-backed screen
+    /// passes its cards through before counting or queueing them.
+    static func eligible(cards: [Card], deckID: UUID? = nil) -> [Card] {
+        cards.filter { card in
             guard !card.suspended, let note = card.note, let deck = note.deck else { return false }
             guard let deckID else { return true }
             return deck.id == deckID
@@ -46,9 +52,29 @@ enum Queue {
         now: Date = Date(),
         counter: NewCardCounter = NewCardCounter()
     ) throws -> [UUID: Counts] {
-        let decks = try context.fetch(FetchDescriptor<Deck>())
-        let cards = try eligibleCards(in: context)
+        counts(
+            decks: try context.fetch(FetchDescriptor<Deck>()),
+            cards: try eligibleCards(in: context),
+            now: now,
+            counter: counter
+        )
+    }
 
+    /// The same counting, over rows that have already been fetched.
+    ///
+    /// This is the overload SwiftUI screens use. A view holds its decks and cards in `@Query`, so
+    /// it already re-renders when either changes; asking it to fetch again through a `ModelContext`
+    /// would compute the same numbers off a second, unobserved read, and the counts would be stale
+    /// exactly when a card was rated.
+    ///
+    /// `cards` is expected to be pre-filtered by ``eligibleCards(in:deckID:)``. Passing a raw fetch
+    /// of every card counts suspended and orphaned ones.
+    static func counts(
+        decks: [Deck],
+        cards: [Card],
+        now: Date = Date(),
+        counter: NewCardCounter = NewCardCounter()
+    ) -> [UUID: Counts] {
         var counts: [UUID: Counts] = [:]
         var newInDeck: [UUID: Int] = [:]
         for deck in decks {
@@ -109,8 +135,24 @@ enum Queue {
         now: Date = Date(),
         counter: NewCardCounter = NewCardCounter()
     ) throws -> [Card] {
-        let cards = try eligibleCards(in: context, deckID: deckID)
+        build(
+            decks: try decks(in: context, deckID: deckID),
+            cards: try eligibleCards(in: context, deckID: deckID),
+            now: now,
+            counter: counter
+        )
+    }
 
+    /// The same queue, over rows that have already been fetched.
+    ///
+    /// `cards` is expected to be pre-filtered by ``eligible(cards:deckID:)``, and `decks` scoped to
+    /// match. What a `@Query`-backed screen calls.
+    static func build(
+        decks: [Deck],
+        cards: [Card],
+        now: Date = Date(),
+        counter: NewCardCounter = NewCardCounter()
+    ) -> [Card] {
         let learning = cards
             .filter { $0.state.isLearning && $0.due <= now }
             .sorted(by: dueThenID)
@@ -120,7 +162,7 @@ enum Queue {
             .sorted(by: dueThenID)
 
         var new: [Card] = []
-        for deck in try decks(in: context, deckID: deckID) {
+        for deck in decks {
             let allowance = counter.allowance(for: deck, on: now)
             guard allowance > 0 else { continue }
 

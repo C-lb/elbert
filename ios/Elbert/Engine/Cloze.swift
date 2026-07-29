@@ -91,6 +91,16 @@ enum Cloze {
         text.firstMatch(of: pattern) != nil
     }
 
+    /// The text with every deletion replaced by its answer and no syntax left.
+    ///
+    /// For lists and previews, where the point is to recognise the note rather than be tested by
+    /// it. `{{c1::Madrid::capital}} is in Spain` reads as `Madrid is in Spain`.
+    static func stripped(_ text: String) -> String {
+        // No ordinal is being asked about, so every deletion renders its answer. `-1` cannot
+        // collide with a real ordinal, which the pattern guarantees is a non-negative integer.
+        render(text, ord: -1, revealed: true)
+    }
+
     /// An empty hint is no hint. `{{c1::x::}}` is a trailing separator someone did not finish
     /// typing, not a request for an empty bracket.
     private static func hint(from captured: Substring?) -> String? {

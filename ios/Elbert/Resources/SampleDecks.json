@@ -1,0 +1,242 @@
+{
+  "_comment": "Sample decks written from real lecture slides (see ios/Tools/extract-slides.py for how the source text was pulled). Loaded only under the -seedSampleData launch argument; see Models/SampleData.swift. Promoting these to starter decks that ship on first launch is a change in SampleData.swift, not here.",
+  "_sources": [
+    "SMU MGMT102 Strategy, T2 AY25/26, sessions 1 to 11 and the week 1 to 7 revision cards",
+    "SMU MKTG101 Marketing, weeks 1 to 13"
+  ],
+  "decks": [
+    {
+      "name": "Strategy",
+      "newPerDay": 12,
+      "desiredRetention": 0.9,
+      "notes": [
+        {
+          "type": "cloze",
+          "term": "Sustained competitive advantage comes from {{c1::analysis}}, then {{c2::formulation}}, then {{c3::implementation}}.",
+          "definition": "The AFI framework: diagnose the competitive challenge, set a guiding policy, then take coherent action.",
+          "tags": ["afi", "week1"]
+        },
+        {
+          "type": "basic",
+          "term": "What are the three elements of a good strategy?",
+          "definition": "Strategic positioning, economic value creation, and strategic fit.",
+          "example": "Southwest: a clear low-cost position, value created at a price customers will pay, and activities that reinforce each other.",
+          "tags": ["week1"]
+        },
+        {
+          "type": "basic",
+          "term": "Why is \"be number one globally\" not a strategy?",
+          "definition": "It is a goal with no diagnosis and no guiding policy. A strategy says where and how to compete, not how big to be.",
+          "tags": ["week1"]
+        },
+        {
+          "type": "basic",
+          "term": "How is economic value created?",
+          "definition": "Perceived value, what a customer is willing to pay, minus the cost of providing the product or service.",
+          "hint": "Two terms, one subtraction",
+          "tags": ["week1"]
+        },
+        {
+          "type": "cloze",
+          "term": "PESTEL scans {{c1::political}}, {{c2::economic}}, {{c3::social}}, {{c4::technological}}, {{c5::ecological}} and {{c6::legal}} forces.",
+          "definition": "The general environment: macro forces the firm has little control over, which shape industry-level forces in turn.",
+          "tags": ["external", "week2"]
+        },
+        {
+          "type": "basic",
+          "term": "Name Porter's five forces.",
+          "definition": "Threat of new entrants, threat of substitutes, bargaining power of buyers, bargaining power of suppliers, and rivalry among existing competitors.",
+          "tags": ["external", "week2"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Complementors",
+          "definition": "The sixth force: firms whose products raise the value of yours, which is why competition and cooperation can run together as co-opetition.",
+          "tags": ["external", "week2"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Strategic group",
+          "definition": "A set of firms in one industry following similar strategies. Profitability differs between groups, and mobility barriers make crossing hard.",
+          "example": "Hermes and Longchamp sit in different strategic groups within leather goods.",
+          "tags": ["external", "week3"]
+        },
+        {
+          "type": "basic",
+          "term": "How does CSV differ from CSR?",
+          "definition": "CSR is reactive and peripheral, usually philanthropy on an external agenda. CSV is proactive and integral, meeting a societal need through the core business, so it can link to competitive advantage.",
+          "tags": ["stakeholders", "week3"]
+        },
+        {
+          "type": "cloze",
+          "term": "VRIO asks whether a resource is {{c1::valuable}}, {{c2::rare}}, {{c3::costly to imitate}}, and whether the firm is {{c4::organised to capture the value}}.",
+          "definition": "All four yes gives sustained competitive advantage. Some yes gives only a temporary one.",
+          "tags": ["internal", "week4"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Resource-based view",
+          "definition": "Explains performance differences by resource heterogeneity and immobility: firms hold different resources, and those resources do not move freely between them.",
+          "tags": ["internal", "week4"]
+        },
+        {
+          "type": "basic",
+          "term": "How do resources, capabilities and core competencies differ?",
+          "definition": "Resources are the assets a firm can draw on. Capabilities are how those resources are bundled and deployed. Core competencies are the unique strengths that competitors cannot match and that link to advantage.",
+          "hint": "Have, do, win",
+          "tags": ["internal", "week4"]
+        },
+        {
+          "type": "basic",
+          "term": "What is the difference between value chain analysis and a strategic activity system?",
+          "definition": "Value chain analysis asks where value is created or lost, and is linear and standardised. A strategic activity system asks how activities interlock, and is a network unique to the firm. Individual activities can be copied; the web is what resists imitation.",
+          "tags": ["internal", "week5"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Isolating mechanisms",
+          "definition": "What protects an advantage from imitation over time, such as path dependence, causal ambiguity, social complexity, and intellectual property.",
+          "tags": ["internal", "week5"]
+        },
+        {
+          "type": "basic",
+          "term": "What does \"stuck in the middle\" mean?",
+          "definition": "Committing to neither differentiation nor cost leadership, and so holding no clear strategic position. The two positions need different resources, capabilities and activities, which is why the trade-off is real.",
+          "example": "Tata Nano and Yahoo are the usual examples.",
+          "tags": ["business-strategy", "week5"]
+        },
+        {
+          "type": "cloze",
+          "term": "The ERRC grid asks what to {{c1::eliminate}}, {{c2::reduce}}, {{c3::raise}} and {{c4::create}}.",
+          "definition": "Blue ocean strategy: value innovation, where the moves that create differentiation also drive cost down.",
+          "example": "IKEA eliminated sales staff, reduced warranties, raised accessibility, and created a new shopping experience.",
+          "tags": ["business-strategy", "week5"]
+        },
+        {
+          "type": "basic",
+          "term": "Why is cost minimisation not cost leadership?",
+          "definition": "Cost minimisation lowers the cost of providing a good without giving up the value position. Cost leadership offers the lowest price at an acceptable quality, and is a strategic position in itself.",
+          "tags": ["business-strategy", "week5"]
+        },
+        {
+          "type": "basic",
+          "term": "What does transaction cost economics decide?",
+          "definition": "Whether to make in-house or buy on the market, by comparing the cost of organising an activity internally against the cost of transacting for it, including principal-agent problems.",
+          "tags": ["corporate", "week6"]
+        },
+        {
+          "type": "cloze",
+          "term": "A strategic resource gap can be closed by {{c1::building}} internally, {{c2::borrowing}} through an alliance, or {{c3::buying}} through an acquisition.",
+          "definition": "Prefer the cheaper, lower-risk option first. A resource that can simply be bought is rarely a source of sustained advantage.",
+          "tags": ["corporate", "week7"]
+        },
+        {
+          "type": "basic",
+          "term": "How does related diversification differ from unrelated?",
+          "definition": "Related businesses share core competencies, so the corporate parent can add value across them. Unrelated businesses, as in a conglomerate, share none, and the sum of the parts has to beat the parts standing alone.",
+          "example": "Amazon into AWS is related: the technology and data capability carries over.",
+          "tags": ["corporate", "week7"]
+        },
+        {
+          "type": "basic",
+          "term": "Roughly how much of performance difference do firm effects explain, against industry effects?",
+          "definition": "Firm effects explain up to about 55 percent, industry effects about 20 percent. Which is why internal analysis cannot be skipped.",
+          "tags": ["week1"]
+        }
+      ]
+    },
+    {
+      "name": "Marketing",
+      "newPerDay": 10,
+      "desiredRetention": 0.9,
+      "notes": [
+        {
+          "type": "cloze",
+          "term": "The marketing mix is {{c1::product}}, {{c2::price}}, {{c3::place}} and {{c4::promotion}}.",
+          "definition": "The set of tactical tools a firm blends to produce the response it wants from its target market.",
+          "tags": ["4ps", "week2"]
+        },
+        {
+          "type": "cloze",
+          "term": "Market strategy runs {{c1::segmentation}}, then {{c2::targeting}}, then {{c3::positioning}}.",
+          "definition": "Split the market into groups, choose which to serve, then decide what to stand for in their minds.",
+          "tags": ["stp", "week5"]
+        },
+        {
+          "type": "basic",
+          "term": "What are the three stages of the strategic marketing process?",
+          "definition": "Plan, implement, evaluate. Evaluation only matters if deviations are acted on.",
+          "tags": ["week3"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Product line",
+          "definition": "A group of related products that function in a similar way, are sold to the same customers, or fall in the same price range.",
+          "tags": ["product", "week6"]
+        },
+        {
+          "type": "basic",
+          "term": "How do product mix width and length differ?",
+          "definition": "Width is the number of different product lines the company carries. Length is the total number of items across those lines.",
+          "hint": "Across, then within",
+          "tags": ["product", "week6"]
+        },
+        {
+          "type": "cloze",
+          "term": "Adopters arrive as {{c1::innovators}}, {{c2::early adopters}}, the {{c3::early majority}}, the {{c4::late majority}}, and {{c5::laggards}}.",
+          "definition": "The diffusion curve. The early majority are pragmatists who wait; laggards stay loyal to the status quo.",
+          "tags": ["adoption", "week7"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Post-decision dissonance",
+          "definition": "The discomfort felt after choosing between close alternatives, which marketers answer with reassurance after the sale rather than before it.",
+          "tags": ["consumer", "week3"]
+        },
+        {
+          "type": "basic",
+          "term": "How does positive reinforcement differ from negative reinforcement?",
+          "definition": "Positive reinforcement adds a pleasant consequence after a response. Negative reinforcement removes an unpleasant one. Both increase the behaviour, which is what separates negative reinforcement from punishment.",
+          "tags": ["consumer", "week3"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Observational learning",
+          "definition": "Learning a behaviour by watching others and the consequences they receive, rather than through direct experience of your own.",
+          "tags": ["consumer", "week3"]
+        },
+        {
+          "type": "basic",
+          "term": "When would you choose skimming over penetration pricing?",
+          "definition": "Skimming sets a high launch price to harvest customers who value the product most, and suits a genuine innovation with weak substitutes. Penetration sets a low price to buy share quickly, and suits a market where scale or a network effect decides the winner.",
+          "tags": ["pricing", "week9"]
+        },
+        {
+          "type": "basic",
+          "term": "What four characteristics separate services from products?",
+          "definition": "Intangibility, heterogeneity, inseparability of production and consumption, and perishability.",
+          "hint": "Cannot touch it, cannot standardise it, cannot separate it, cannot store it",
+          "tags": ["services", "week7"]
+        },
+        {
+          "type": "basicReversed",
+          "term": "Brand extension",
+          "definition": "Using an established brand name to launch a product in a new category. It borrows the parent's equity, and it can damage that equity when the fit is poor.",
+          "tags": ["branding", "week6"]
+        },
+        {
+          "type": "basic",
+          "term": "What are the four bases of market segmentation?",
+          "definition": "Geographic, demographic, psychographic and behavioural. Demographic is the most used, which is not the same as the most useful.",
+          "tags": ["stp", "week5"]
+        },
+        {
+          "type": "basic",
+          "term": "Who counts as a direct competitor?",
+          "definition": "The firms customers perceive as close substitutes, not the ones that merely sell the same category. Perception decides the competitive set.",
+          "tags": ["stp", "week5"]
+        }
+      ]
+    }
+  ]
+}
