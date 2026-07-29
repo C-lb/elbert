@@ -104,9 +104,19 @@ The existing TypeScript is the reference specification. It is reviewed, tested, 
 
 **Note field editing** (`src/engine/editor-row.ts`). Empty optional fields (example, hint, image) are removed rather than stored as empty strings, and a save is skipped entirely when nothing the editor owns has changed.
 
-### FSRS parity risk
+### FSRS parity, resolved during task 1
 
-The current app uses `ts-fsrs` 5.4 with default parameters, which is FSRS-5. `open-spaced-repetition/swift-fsrs` must be checked at implementation time for which algorithm generation and default weight vector it ships. If it is FSRS-6, intervals will not match the web app. Since there is no data migration this is not a correctness bug, but it is a decision to make knowingly rather than discover later. Verification: schedule the same synthetic card through both implementations with identical inputs and compare intervals for all four ratings.
+The original draft of this section guessed wrong and is corrected here.
+
+**Measured facts.** The web app runs `ts-fsrs` 5.4.1, whose default weight vector is **21 weights** ending in a `0.1542` decay term. That is the FSRS-6 signature, so the web app is on **FSRS-6**, not FSRS-5 as first written. The only tagged release of `open-spaced-repetition/swift-fsrs` is **5.0.0** (Oct 2024), which ships a **19-weight FSRS-5** vector.
+
+So the pinned Swift package is one generation *behind* the web app, the reverse of the risk originally anticipated.
+
+**Option A, stay on tagged 5.0.0 (FSRS-5).** Stable, tagged, no dependency risk. Scheduling is a generation old. Given there is no data migration and Elbert starts empty, nothing breaks, intervals are just modelled slightly less well.
+
+**Option B, track `swift-fsrs` `main`.** HEAD adds `BasicSchedulerV6`, an algorithm-version detector keyed on vector length (19 means v5, 21 means v6), and an `FSRSDefaults.defaultWv6` vector that matches the ts-fsrs 5.4.1 defaults byte for byte, including the decay constant. FSRS-6 is opt-in there by passing the 21-weight vector; the package still defaults to v5 on purpose so it never silently migrates anyone. Cost: `main` carries no release tag, so this means pinning a branch or a bare revision.
+
+**Decision point: task 6.** Not made yet. Task 6 must pick one, record the choice, and either way run the parity check: schedule the same synthetic card through both implementations with identical inputs and compare intervals across all four ratings.
 
 ## 7. Design system
 
@@ -164,7 +174,7 @@ Neither blocks the start of implementation. Item 1 blocks the first build that t
 
 | Risk | Handling |
 |---|---|
-| Swift FSRS ships a different algorithm generation than `ts-fsrs` 5.4 | Compared explicitly in task 6 before any screen depends on it |
+| Swift FSRS is a generation behind the web app (measured: tagged 5.0.0 is FSRS-5, web is FSRS-6) | Two options written up in section 6, decided and recorded in task 6 before any screen depends on it |
 | CloudKit schema changes are effectively append-only once deployed to production | Model layer is finalised and reviewed in task 3, before data exists |
 | Losing the soft-delete round-trip guarantee | Covered by an explicit reconciliation test, see Section 6 |
 | Rewrite fatigue with no shippable artifact for a stretch | Wave 1 is deliberately the smallest genuinely usable app, and task order puts a studyable loop on device before the polish screens |
@@ -202,8 +212,10 @@ Create `ios/Elbert` Xcode project, iOS 17 deployment target, Swift 6. Add SPM de
 
 ### Task 6, scheduler
 
-`Engine/Scheduler.swift`: FSRS wrapper, review application with `Review` snapshot, four-rating interval preview with the existing label format. **Includes the FSRS parity check from Section 6.**
-**Verify:** unit tests on label formatting boundaries and state transitions. Parity comparison against `ts-fsrs` recorded in the task report, with the generation mismatch called out explicitly if there is one.
+`Engine/Scheduler.swift`: FSRS wrapper, review application with `Review` snapshot, four-rating interval preview with the existing label format.
+
+**Decides the FSRS generation question from Section 6:** tagged 5.0.0 on FSRS-5, or `swift-fsrs` `main` pinned to a revision for FSRS-6 parity with the web app. Caleb's call, ask before implementing.
+**Verify:** unit tests on label formatting boundaries and state transitions. Parity comparison against `ts-fsrs` recorded in the task report, including which generation was chosen and why.
 
 ### Task 7, queue
 
