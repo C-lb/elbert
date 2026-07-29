@@ -213,12 +213,43 @@ enum TypeRole: CaseIterable, Sendable {
 
     var font: Font { Font(uiFont) }
 
+    /// The role's true line height in points: baseline to baseline.
+    var lineHeight: CGFloat { size * leading }
+
     /// SwiftUI `lineSpacing` is *extra* space added between lines, on top of the font's own
-    /// line height. To land on the role's true leading we subtract what the font already gives.
-    /// Clamped at zero, which is what guarantees no line ever collides with the one above it:
-    /// the natural line height of DM Sans is already looser than the display and h2 targets.
+    /// line height, and it cannot go negative. DM Sans has a natural line height of 1.302em,
+    /// so for any role whose target leading is looser than that this lands exactly on target.
     var lineSpacing: CGFloat {
-        max(0, size * leading - uiFont.lineHeight)
+        max(0, lineHeight - uiFont.lineHeight)
+    }
+
+    /// True when the role's target leading is **tighter** than DM Sans' natural 1.302em, so
+    /// `lineSpacing` alone cannot reach it.
+    ///
+    /// Display, h2 and h3 all fall here, which is precisely where tight leading is the house
+    /// look, so leaving them at the natural line height would give up the thing the type
+    /// scale exists to protect. `HouseText` renders these through `NSParagraphStyle`
+    /// instead, which *can* compress a line box.
+    var needsCompressedLeading: Bool {
+        lineHeight < uiFont.lineHeight - 0.01
+    }
+
+    /// Roles that only ever hold one line: a button label, a tab caption. Their leading of
+    /// 1.0 is deliberate and there is no second line for it to collide with.
+    var isSingleLine: Bool {
+        switch self {
+        case .label, .labelSmall: true
+        default: false
+        }
+    }
+
+    /// Space between the descender of one line and the cap height of the next, at the role's
+    /// target leading. Must stay positive for any wrapping role or lines collide, which is
+    /// what the old clamp at zero was protecting against. Meaningless for `isSingleLine`
+    /// roles, which measure slightly negative by design.
+    var interlineClearance: CGFloat {
+        let font = uiFont
+        return lineHeight - abs(font.descender) - font.capHeight
     }
 
     var name: String {
@@ -268,6 +299,108 @@ private struct CapBaselineTrim: ViewModifier {
         return content
             .padding(.top, -above)
             .padding(.bottom, -below)
+    }
+}
+
+// MARK: - Text with a compressed line box
+
+/// House body of text. Use this instead of `Text(...).typeRole(...)` for anything that can
+/// wrap, and always for `display`, `h2` and `h3`.
+///
+/// SwiftUI's `lineSpacing` can only ever *add* space, so it cannot reach a leading tighter
+/// than the font's own line height, and DM Sans is a loose 1.302em. For the three tight
+/// roles this renders through a `UILabel` carrying an `NSParagraphStyle` with
+/// `minimumLineHeight` and `maximumLineHeight` pinned to the role's target, plus a
+/// compensating `baselineOffset` so the glyphs stay centred in the compressed line box
+/// rather than riding its top edge. Every other role goes down the plain SwiftUI path.
+struct HouseText: View {
+    let content: String
+    var role: TypeRole = .body
+    /// Which rung of the ink ladder this text sits on.
+    var ink: KeyPath<Palette, ColorToken> = \.ink
+    var alignment: TextAlignment = .leading
+
+    init(
+        _ content: String,
+        role: TypeRole = .body,
+        ink: KeyPath<Palette, ColorToken> = \.ink,
+        alignment: TextAlignment = .leading
+    ) {
+        self.content = content
+        self.role = role
+        self.ink = ink
+        self.alignment = alignment
+    }
+
+    var body: some View {
+        if role.needsCompressedLeading {
+            CompressedLeadingLabel(content: content, role: role, ink: ink, alignment: alignment)
+        } else {
+            Text(content)
+                .typeRole(role)
+                .multilineTextAlignment(alignment)
+                .foregroundStyle(Color(uiColor: Theme.uiColor(ink)))
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+private struct CompressedLeadingLabel: UIViewRepresentable {
+    let content: String
+    let role: TypeRole
+    let ink: KeyPath<Palette, ColorToken>
+    let alignment: TextAlignment
+
+    func makeUIView(context: Context) -> UILabel {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.lineBreakMode = .byWordWrapping
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        return label
+    }
+
+    func updateUIView(_ label: UILabel, context: Context) {
+        label.attributedText = attributedString()
+    }
+
+    func sizeThatFits(_ proposal: ProposedViewSize, uiView label: UILabel, context: Context) -> CGSize? {
+        let proposed = proposal.width ?? .greatestFiniteMagnitude
+        let width = proposed.isFinite && proposed > 0 ? proposed : .greatestFiniteMagnitude
+        let fitted = label.sizeThatFits(CGSize(width: width, height: .greatestFiniteMagnitude))
+        return CGSize(width: min(fitted.width, width), height: fitted.height)
+    }
+
+    private func attributedString() -> NSAttributedString {
+        let font = role.uiFont
+        let lineHeight = role.lineHeight
+
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.minimumLineHeight = lineHeight
+        paragraph.maximumLineHeight = lineHeight
+        paragraph.lineBreakMode = .byWordWrapping
+        paragraph.alignment = nsAlignment
+
+        // Compressing the line box from `font.lineHeight` down to `lineHeight` takes the
+        // space off the top, which leaves the glyphs sitting low. Half the difference put
+        // back on the baseline recentres them, and `baselineOffset` moves text by twice its
+        // value against the line box, hence the quarter.
+        let offset = (lineHeight - font.lineHeight) / 4
+
+        return NSAttributedString(string: content, attributes: [
+            .font: font,
+            .foregroundColor: Theme.uiColor(ink),
+            .kern: role.trackingPoints,
+            .paragraphStyle: paragraph,
+            .baselineOffset: offset,
+        ])
+    }
+
+    private var nsAlignment: NSTextAlignment {
+        switch alignment {
+        case .center: .center
+        case .trailing: .right
+        default: .left
+        }
     }
 }
 

@@ -10,6 +10,7 @@
 		07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52B715D527791D66B8B78C6 /* ElbertUITests.swift */; };
 		1D9A490A881552337C9F124A /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A332AEF634FF9758F7A5DF20 /* Buttons.swift */; };
 		3BB50B1455929D5ADB5DDAF9 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA04ED33542FCF20E3D5343 /* Feedback.swift */; };
+		52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */; };
 		567703E5CF0B7C1371CB2E9C /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2E2E2EF0E6E14538CA5D10 /* Icons.swift */; };
 		5E086AFD438D3A93E385A912 /* DesignGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0C274950BE16D9C5FD03C5 /* DesignGallery.swift */; };
 		65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E7A2E10B27330E83314BDB /* ElbertApp.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		0FEFB9CA951FE21A831C31F1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		1BA04ED33542FCF20E3D5343 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		1FAAC81112D995D76EF6B27E /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
@@ -72,6 +74,7 @@
 		041CC04E14468F8876F12B83 /* ElbertTests */ = {
 			isa = PBXGroup;
 			children = (
+				01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */,
 				9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */,
 			);
 			path = ElbertTests;
@@ -326,6 +329,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */,
 				9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

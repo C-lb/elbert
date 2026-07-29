@@ -51,9 +51,7 @@ struct DesignGallery: View {
             Text("Design system")
                 .typeRole(.eyebrow)
                 .foregroundStyle(Theme.ink2)
-            Text(section.title)
-                .typeRole(.display)
-                .foregroundStyle(Theme.ink)
+            HouseText(section.title, role: .display)
         }
     }
 }
@@ -92,9 +90,7 @@ private struct SectionHeading: View {
     let title: String
 
     var body: some View {
-        Text(title)
-            .typeRole(.h3)
-            .foregroundStyle(Theme.ink)
+        HouseText(title, role: .h3)
     }
 }
 
@@ -256,10 +252,11 @@ private struct TypeSection: View {
         VStack(alignment: .leading, spacing: Space.s5) {
             ForEach(roles, id: \.self) { role in
                 VStack(alignment: .leading, spacing: Space.s2) {
-                    Text(specimen(for: role))
-                        .typeRole(role)
-                        .foregroundStyle(role == .caption || role == .eyebrow ? Theme.ink2 : Theme.ink)
-                        .fixedSize(horizontal: false, vertical: true)
+                    HouseText(
+                        specimen(for: role),
+                        role: role,
+                        ink: role == .caption || role == .eyebrow ? \.ink2 : \.ink
+                    )
                     Text(metrics(for: role))
                         .typeRole(.caption)
                         .foregroundStyle(Theme.ink3)
@@ -271,9 +268,11 @@ private struct TypeSection: View {
 
     private func specimen(for role: TypeRole) -> String {
         switch role {
-        case .display: "Study what you forget"
-        case .h2: "Decks and daily allowance"
-        case .h3: "Desired retention"
+        // The tight roles get enough words to wrap, because a compressed line box is only
+        // worth checking on the second line and the one under it.
+        case .display: "Study what you forget, skip what you know"
+        case .h2: "Decks, daily allowance and the pace you keep"
+        case .h3: "Desired retention and how gently it moves"
         case .lead, .body:
             "Cards you rate again come back inside the same session. Everything else leaves and returns on its own schedule."
         case .bodyStrong: "Two cards are due right now."
@@ -286,7 +285,9 @@ private struct TypeSection: View {
 
     private func metrics(for role: TypeRole) -> String {
         let tracking = String(format: "%.3f", role.trackingEm)
-        return "\(role.name) · \(Int(role.size))pt · wght \(Int(role.weight)) · leading \(role.leading) · tracking \(tracking)em"
+        let clearance = String(format: "%.1f", role.interlineClearance)
+        let path = role.needsCompressedLeading ? "paragraph style" : "lineSpacing"
+        return "\(role.name) · \(Int(role.size))pt · wght \(Int(role.weight)) · leading \(role.leading) via \(path) · tracking \(tracking)em · clearance \(clearance)pt"
     }
 }
 
@@ -387,7 +388,7 @@ private struct ButtonStatesSection: View {
                     .buttonStyle(.house(.neutral, size: .medium, role: .danger))
             }
 
-            Text("Press and hold any button for the pressed fill and the impact haptic. Medium padding is 12 vertical and 24 horizontal, small is 8 and 16, exactly 2 to 1.")
+            Text("Press and hold any button for the pressed fill and the impact haptic. The filled box is sized by padding alone, so medium is 12 vertical and 24 horizontal and small is 8 and 16, exactly 2 to 1, and the tiers differ in height. The 44pt tap target sits outside the fill.")
                 .typeRole(.caption)
                 .foregroundStyle(Theme.ink3)
                 .fixedSize(horizontal: false, vertical: true)
@@ -412,9 +413,7 @@ private struct ButtonContextSection: View {
                     Text("Due today")
                         .typeRole(.eyebrow)
                         .foregroundStyle(Theme.ink2)
-                    Text("Spanish verbs")
-                        .typeRole(.h2)
-                        .foregroundStyle(Theme.ink)
+                    HouseText("Spanish verbs and the ones you keep missing", role: .h2)
                     Text("12 cards are due and 5 are new. Ratings you give now change when each card comes back.")
                         .typeRole(.body)
                         .foregroundStyle(Theme.ink2)

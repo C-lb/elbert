@@ -18,6 +18,11 @@ enum Icon: String, CaseIterable, Sendable {
     case dismiss = "xmark"
     case stats = "chart.bar"
     case synced = "checkmark.icloud"
+    /// Semantic, for a warning notice. Distinct from `dismiss` on purpose: a red xmark
+    /// beside a grey xmark dismiss button is two identical glyphs meaning different things.
+    case caution = "exclamationmark.triangle"
+    /// Semantic, for an error notice.
+    case problem = "exclamationmark.octagon"
 
     /// The outline symbol, used at rest.
     var symbol: String { rawValue }
@@ -55,6 +60,8 @@ enum Icon: String, CaseIterable, Sendable {
         case .dismiss: "dismiss"
         case .stats: "stats"
         case .synced: "synced"
+        case .caution: "caution"
+        case .problem: "problem"
         }
     }
 }

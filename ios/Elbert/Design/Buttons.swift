@@ -35,7 +35,8 @@ enum HouseButtonSize: Sendable {
 
     var role: TypeRole { .label }
 
-    /// Minimum tap target, so a small button is still reachable with a thumb.
+    /// Minimum tap target, so a small button is still reachable with a thumb. Reserved
+    /// *around* the filled shape, never by inflating it: the fill is sized by padding alone.
     var minimumSide: CGFloat { 44 }
 }
 
@@ -114,18 +115,31 @@ struct HouseButtonStyle: ButtonStyle {
         @Environment(\.houseButtonIsLoading) private var isLoading
 
         var body: some View {
+            filledBox
+                // The 44pt tap target is reserved *outside* the filled shape.
+                //
+                // This frame used to sit before `.background`, which stretched the fill
+                // itself to 44 tall. Medium then rendered 16.05 vertical against 24
+                // horizontal (1.50:1), small 16.05 against 16 (1.00:1), and both tiers came
+                // out the same height, so the only surviving difference between them was
+                // the corner radius. The house rule governs the rendered box, not the
+                // arithmetic, so the box is now sized purely by its padding and the tap
+                // target is a transparent frame around it.
+                .frame(minWidth: size.minimumSide, minHeight: size.minimumSide)
+                .contentShape(Rectangle())
+                .animation(.snappy(duration: 0.12), value: configuration.isPressed)
+                .onChange(of: configuration.isPressed) { _, pressed in
+                    if pressed { Haptics.impact(.light) }
+                }
+        }
+
+        private var filledBox: some View {
             content
-                .frame(minWidth: minimumWidth, minHeight: size.minimumSide)
                 .background(fill, in: shape)
                 .overlay(shape.strokeBorder(strokeColour, lineWidth: 1))
                 .overlay(focusRing)
                 .houseShadow(isEnabled ? elevation : .flat)
                 .opacity(isEnabled ? 1 : 0.55)
-                .contentShape(shape)
-                .animation(.snappy(duration: 0.12), value: configuration.isPressed)
-                .onChange(of: configuration.isPressed) { _, pressed in
-                    if pressed { Haptics.impact(.light) }
-                }
         }
 
         @ViewBuilder
@@ -133,23 +147,44 @@ struct HouseButtonStyle: ButtonStyle {
             ZStack {
                 // The label is held in place while loading so the button cannot change width
                 // mid-request, which would shift everything beside it.
-                configuration.label
-                    .typeRole(size.role)
-                    .lineLimit(1)
-                    .capTrim(size.role)
+                label
                     .opacity(isLoading ? 0 : 1)
 
                 if isLoading {
-                    RingSpinner(role: size.role, scale: 0.9)
+                    RingSpinner(role: size.role, scale: spinnerScale)
                 }
             }
+            // The trimmed label is exactly cap-height tall. Without this floor the spinner,
+            // which is taller, would grow the button the moment a request started.
+            .frame(minHeight: labelBoxHeight)
             .foregroundStyle(foreground)
             .padding(.vertical, size.verticalPadding)
             .padding(.horizontal, tier == .icon ? size.verticalPadding : size.horizontalPadding)
         }
 
-        private var minimumWidth: CGFloat? {
-            tier == .icon ? size.minimumSide : nil
+        /// The icon tier holds a glyph, not text, so trimming a font's leading off it would
+        /// only squash the symbol and stop the fill being square.
+        @ViewBuilder
+        private var label: some View {
+            if tier == .icon {
+                configuration.label.typeRole(size.role)
+            } else {
+                configuration.label
+                    .typeRole(size.role)
+                    .lineLimit(1)
+                    .capTrim(size.role)
+            }
+        }
+
+        /// Cap height of the label role: the height a `capTrim`ed single-line label occupies.
+        private var labelBoxHeight: CGFloat {
+            size.role.uiFont.capHeight
+        }
+
+        /// Sized so the loader matches the label's cap height and the box cannot change
+        /// height between the resting and the loading state.
+        private var spinnerScale: CGFloat {
+            labelBoxHeight / size.role.size
         }
 
         private var shape: RoundedRectangle {

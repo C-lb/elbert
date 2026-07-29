@@ -24,6 +24,20 @@ struct ColorToken: Sendable, Equatable {
     }
 
     var color: Color { Color(uiColor: uiColor) }
+
+    /// WCAG relative luminance, 0 (black) to 1 (white), ignoring alpha.
+    ///
+    /// The surface ladder is a contract (`canvas` < `surface1` < `surface2` < `surface3`)
+    /// and this is what lets a test assert it rather than trusting the hex values by eye.
+    var relativeLuminance: Double {
+        func linear(_ channel: Double) -> Double {
+            channel <= 0.04045 ? channel / 12.92 : pow((channel + 0.055) / 1.055, 2.4)
+        }
+        let red = linear(Double((hex >> 16) & 0xff) / 255)
+        let green = linear(Double((hex >> 8) & 0xff) / 255)
+        let blue = linear(Double(hex & 0xff) / 255)
+        return 0.2126 * red + 0.7152 * green + 0.0722 * blue
+    }
 }
 
 // MARK: - Palette
@@ -74,7 +88,8 @@ struct Palette: Sendable {
 }
 
 extension Palette {
-    /// Dark is primary. `canvas` < `surface1` < `surface2` < `surface3` in lightness.
+    /// Dark is primary. `canvas` < `surface1` < `surface2` < `surface3` in lightness,
+    /// in **both** appearances. `PaletteTests` asserts it, so the ladder cannot drift.
     static let dark = Palette(
         canvas: ColorToken(0x111113),
         surface1: ColorToken(0x1a1a1e),
@@ -113,11 +128,15 @@ extension Palette {
     )
 
     /// Light appearance. Flat off-white canvas, surfaces step toward white but never reach it.
+    ///
+    /// The ladder runs the same direction as dark: each surface is *lighter* than the one
+    /// below it. That means the canvas has to be the darkest value here, not a mid one, or
+    /// there is no headroom left above `surface2` for `surface3` to occupy.
     static let light = Palette(
-        canvas: ColorToken(0xf1f1f3),
-        surface1: ColorToken(0xf9f9fa),
-        surface2: ColorToken(0xfdfdfe),
-        surface3: ColorToken(0xececed),
+        canvas: ColorToken(0xececed),
+        surface1: ColorToken(0xf4f4f6),
+        surface2: ColorToken(0xf9f9fb),
+        surface3: ColorToken(0xfdfdfe),
         stroke: ColorToken(0x000000, alpha: 0.08),
 
         ink: ColorToken(0x17171a),
@@ -190,11 +209,17 @@ extension View {
 /// the call site knowing which one it is. `\.palette` is there for the rare case that
 /// needs the raw value (a `UIColor`, a gradient stop, a computed contrast check).
 enum Theme {
-    private static func dynamic(_ path: KeyPath<Palette, ColorToken>) -> Color {
-        Color(uiColor: UIColor { trait in
+    /// A `UIColor` that resolves off the trait collection it is drawn in, for the few places
+    /// that need UIKit rather than SwiftUI (`HouseText`'s label, chiefly).
+    static func uiColor(_ path: KeyPath<Palette, ColorToken>) -> UIColor {
+        UIColor { trait in
             let palette: Palette = trait.userInterfaceStyle == .dark ? .dark : .light
             return palette[keyPath: path].uiColor
-        })
+        }
+    }
+
+    private static func dynamic(_ path: KeyPath<Palette, ColorToken>) -> Color {
+        Color(uiColor: uiColor(path))
     }
 
     static let canvas = dynamic(\.canvas)
@@ -226,6 +251,13 @@ enum Theme {
     static let warn = dynamic(\.warn)
     static let warnSoft = dynamic(\.warnSoft)
     static let warnLine = dynamic(\.warnLine)
+
+    /// Shadow ink is dynamic for the same reason every other token is: a view that never
+    /// saw `.housePalette()` still has to render the right appearance. Reading the shadow
+    /// off `\.palette` instead made an un-injected screen draw light-mode colours under a
+    /// dark-mode shadow.
+    static let shadowCard = dynamic(\.shadowCard)
+    static let shadowPop = dynamic(\.shadowPop)
 }
 
 // MARK: - Semantic role
@@ -310,20 +342,29 @@ enum Elevation {
     case flat
 }
 
+/// `.shadow` propagates down to every leaf drawing primitive, so without a compositing
+/// group each glyph inside a shadowed container casts its own shadow and the text sits in a
+/// grey smudge. `.compositingGroup()` flattens the subtree first, so the shadow is cast by
+/// the assembled silhouette (in practice the background shape) and by nothing else.
+///
+/// It is invisible in dark mode, where a black shadow falls on a near-black card, which is
+/// exactly why it survived review.
 private struct HouseShadow: ViewModifier {
     let elevation: Elevation
-    @Environment(\.palette) private var palette
 
     func body(content: Content) -> some View {
         switch elevation {
         case .flat:
             content
         case .card:
-            content.shadow(color: palette.shadowCard.color, radius: 17, x: 0, y: 10)
+            content
+                .compositingGroup()
+                .shadow(color: Theme.shadowCard, radius: 17, x: 0, y: 10)
         case .pop:
             content
-                .shadow(color: palette.shadowPop.color, radius: 24, x: 0, y: 16)
-                .shadow(color: palette.shadowCard.color, radius: 6, x: 0, y: 2)
+                .compositingGroup()
+                .shadow(color: Theme.shadowPop, radius: 24, x: 0, y: 16)
+                .shadow(color: Theme.shadowCard, radius: 6, x: 0, y: 2)
         }
     }
 }

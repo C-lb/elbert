@@ -127,7 +127,8 @@ struct Toast: Identifiable, Equatable {
         switch role {
         case .success: .confirm
         case .info: .synced
-        case .warning, .danger: .dismiss
+        case .warning: .caution
+        case .danger: .problem
         }
     }
 
