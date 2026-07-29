@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		06CDFF04BE3EC9527E2ED890 /* ClozeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA967F1A12915216E9A8F350 /* ClozeTests.swift */; };
 		07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52B715D527791D66B8B78C6 /* ElbertUITests.swift */; };
 		1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BF213188459A5C1BBB44AA /* ModelsTests.swift */; };
 		1D9A490A881552337C9F124A /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A332AEF634FF9758F7A5DF20 /* Buttons.swift */; };
@@ -25,6 +26,7 @@
 		9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */; };
 		D695BA23B249C10C83209B97 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 004477F5E274521831ABE4CA /* Card.swift */; };
 		DF896C3BD47A0C5110EC53BF /* Typography.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FEFB9CA951FE21A831C31F1 /* Typography.swift */; };
+		F1A9A1F0E888A7390930AB4D /* Cloze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BF6DFC83464AE4483F8C /* Cloze.swift */; };
 		F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEF47AD555DC9FDFA26DA12 /* Theme.swift */; };
 		F74066CD6142ED8CA4510EC3 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = FF0D51918099DC4CB23C122E /* FSRS */; };
 /* End PBXBuildFile section */
@@ -49,6 +51,7 @@
 /* Begin PBXFileReference section */
 		004477F5E274521831ABE4CA /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
+		01D3BF6DFC83464AE4483F8C /* Cloze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cloze.swift; sourceTree = "<group>"; };
 		0FEFB9CA951FE21A831C31F1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		1BA04ED33542FCF20E3D5343 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		1EF15A0AC138CED597573830 /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
@@ -68,6 +71,7 @@
 		A1971F822C159FCBA0FAD731 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		A332AEF634FF9758F7A5DF20 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		B83C1AB0C3F6D61B1310EB77 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		BA967F1A12915216E9A8F350 /* ClozeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClozeTests.swift; sourceTree = "<group>"; };
 		BEC558650956D409A959140F /* DMSans.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DMSans.ttf; sourceTree = "<group>"; };
 		D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B715D527791D66B8B78C6 /* ElbertUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertUITests.swift; sourceTree = "<group>"; };
@@ -90,6 +94,7 @@
 		041CC04E14468F8876F12B83 /* ElbertTests */ = {
 			isa = PBXGroup;
 			children = (
+				BA967F1A12915216E9A8F350 /* ClozeTests.swift */,
 				01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */,
 				9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */,
 				25BF213188459A5C1BBB44AA /* ModelsTests.swift */,
@@ -179,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				87B26974EF8AF821EF15AAB4 /* .gitkeep */,
+				01D3BF6DFC83464AE4483F8C /* Cloze.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -341,6 +347,7 @@
 			files = (
 				1D9A490A881552337C9F124A /* Buttons.swift in Sources */,
 				D695BA23B249C10C83209B97 /* Card.swift in Sources */,
+				F1A9A1F0E888A7390930AB4D /* Cloze.swift in Sources */,
 				4175C333970EA3210273F9BC /* Deck.swift in Sources */,
 				5E086AFD438D3A93E385A912 /* DesignGallery.swift in Sources */,
 				65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */,
@@ -360,6 +367,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06CDFF04BE3EC9527E2ED890 /* ClozeTests.swift in Sources */,
 				52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */,
 				9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */,
 				1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */,
