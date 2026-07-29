@@ -31,3 +31,13 @@ playwright/.cache
 *.njsproj
 *.sln
 *.sw?
+
+# Xcode / iOS
+xcuserdata/
+*.xcworkspace/xcuserdata/
+DerivedData/
+.swiftpm/
+*.xcuserstate
+build/
+*.ipa
+*.dSYM.zip

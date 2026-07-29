@@ -1,0 +1,615 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52B715D527791D66B8B78C6 /* ElbertUITests.swift */; };
+		65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E7A2E10B27330E83314BDB /* ElbertApp.swift */; };
+		842E5311EA48BFB3547FEBD6 /* DMSans.ttf in Resources */ = {isa = PBXBuildFile; fileRef = BEC558650956D409A959140F /* DMSans.ttf */; };
+		9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */; };
+		F74066CD6142ED8CA4510EC3 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = FF0D51918099DC4CB23C122E /* FSRS */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9C065850694AC0787C6EF3BF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0B9BFE453F1F0D19D5440374 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D542C80AEA7618D12E3BD8B;
+			remoteInfo = Elbert;
+		};
+		A285AE0ED40A9A4350B4CC9B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0B9BFE453F1F0D19D5440374 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4D542C80AEA7618D12E3BD8B;
+			remoteInfo = Elbert;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		1FAAC81112D995D76EF6B27E /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		52E7A2E10B27330E83314BDB /* ElbertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertApp.swift; sourceTree = "<group>"; };
+		80195AAAEE079FF0154B2DA5 /* ElbertUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		87B26974EF8AF821EF15AAB4 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertTests.swift; sourceTree = "<group>"; };
+		A1971F822C159FCBA0FAD731 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		B83C1AB0C3F6D61B1310EB77 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
+		BEC558650956D409A959140F /* DMSans.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DMSans.ttf; sourceTree = "<group>"; };
+		D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D52B715D527791D66B8B78C6 /* ElbertUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertUITests.swift; sourceTree = "<group>"; };
+		E7C389F69D8800A969A18FEF /* Elbert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Elbert.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5ECFDE3DD58D4391D10EAC43 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F74066CD6142ED8CA4510EC3 /* FSRS in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		041CC04E14468F8876F12B83 /* ElbertTests */ = {
+			isa = PBXGroup;
+			children = (
+				9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */,
+			);
+			path = ElbertTests;
+			sourceTree = "<group>";
+		};
+		0B6C02D2B213435F9E16E340 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				041CC04E14468F8876F12B83 /* ElbertTests */,
+				8962126AF7C214EB0DAD93BB /* ElbertUITests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		2BAE8DC56E33DCB186241F78 /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				1FAAC81112D995D76EF6B27E /* .gitkeep */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		33AA0AEC3BF5DB6D6276A2A9 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A2F6333DE6F00C2C70642134 /* Fonts */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		568A88C91AA86637C66D025A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A1971F822C159FCBA0FAD731 /* .gitkeep */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		6EF0D61377BD5F1C30247657 = {
+			isa = PBXGroup;
+			children = (
+				8F978846838EF3ED0D51D95D /* Elbert */,
+				9C013B68BCF40C69B8354F56 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7DD961DB0AF0192CB0C3C6AA /* App */ = {
+			isa = PBXGroup;
+			children = (
+				52E7A2E10B27330E83314BDB /* ElbertApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		8962126AF7C214EB0DAD93BB /* ElbertUITests */ = {
+			isa = PBXGroup;
+			children = (
+				D52B715D527791D66B8B78C6 /* ElbertUITests.swift */,
+			);
+			path = ElbertUITests;
+			sourceTree = "<group>";
+		};
+		8F978846838EF3ED0D51D95D /* Elbert */ = {
+			isa = PBXGroup;
+			children = (
+				7DD961DB0AF0192CB0C3C6AA /* App */,
+				FABD692EF407C7F4DD4C2218 /* Design */,
+				9AC9F255CA32D919A5648858 /* Engine */,
+				568A88C91AA86637C66D025A /* Models */,
+				33AA0AEC3BF5DB6D6276A2A9 /* Resources */,
+				2BAE8DC56E33DCB186241F78 /* Screens */,
+				0B6C02D2B213435F9E16E340 /* Tests */,
+			);
+			path = Elbert;
+			sourceTree = "<group>";
+		};
+		9AC9F255CA32D919A5648858 /* Engine */ = {
+			isa = PBXGroup;
+			children = (
+				87B26974EF8AF821EF15AAB4 /* .gitkeep */,
+			);
+			path = Engine;
+			sourceTree = "<group>";
+		};
+		9C013B68BCF40C69B8354F56 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E7C389F69D8800A969A18FEF /* Elbert.app */,
+				D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */,
+				80195AAAEE079FF0154B2DA5 /* ElbertUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A2F6333DE6F00C2C70642134 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				BEC558650956D409A959140F /* DMSans.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		FABD692EF407C7F4DD4C2218 /* Design */ = {
+			isa = PBXGroup;
+			children = (
+				B83C1AB0C3F6D61B1310EB77 /* .gitkeep */,
+			);
+			path = Design;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		34CCDCB8BB8F5C2ABC530D0E /* ElbertUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E365B47D45B2E04144AC17C1 /* Build configuration list for PBXNativeTarget "ElbertUITests" */;
+			buildPhases = (
+				2941F735856C3358B60B0E6E /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2F775738B21B66F25E92DFC0 /* PBXTargetDependency */,
+			);
+			name = ElbertUITests;
+			packageProductDependencies = (
+			);
+			productName = ElbertUITests;
+			productReference = 80195AAAEE079FF0154B2DA5 /* ElbertUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		4D542C80AEA7618D12E3BD8B /* Elbert */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 8DA4284FFAAD9EAFA21AB0C2 /* Build configuration list for PBXNativeTarget "Elbert" */;
+			buildPhases = (
+				60E1F741B128E63395374880 /* Sources */,
+				D361AD240D0D3F98EE3CB08E /* Resources */,
+				5ECFDE3DD58D4391D10EAC43 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Elbert;
+			packageProductDependencies = (
+				FF0D51918099DC4CB23C122E /* FSRS */,
+			);
+			productName = Elbert;
+			productReference = E7C389F69D8800A969A18FEF /* Elbert.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9A618B27F046F5159313E311 /* ElbertTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 50897324BEE91077173CCA34 /* Build configuration list for PBXNativeTarget "ElbertTests" */;
+			buildPhases = (
+				6DBA243DF16C3583F03DF591 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9A6E2005C2BA9C8E9429EB3C /* PBXTargetDependency */,
+			);
+			name = ElbertTests;
+			packageProductDependencies = (
+			);
+			productName = ElbertTests;
+			productReference = D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		0B9BFE453F1F0D19D5440374 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					34CCDCB8BB8F5C2ABC530D0E = {
+						TestTargetID = 4D542C80AEA7618D12E3BD8B;
+					};
+					4D542C80AEA7618D12E3BD8B = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9AB69DA4DE40C6C98EF17933 /* Build configuration list for PBXProject "Elbert" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 6EF0D61377BD5F1C30247657;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				353F4D43063689967DA8E6E7 /* XCRemoteSwiftPackageReference "swift-fsrs" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 9C013B68BCF40C69B8354F56 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4D542C80AEA7618D12E3BD8B /* Elbert */,
+				9A618B27F046F5159313E311 /* ElbertTests */,
+				34CCDCB8BB8F5C2ABC530D0E /* ElbertUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D361AD240D0D3F98EE3CB08E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				842E5311EA48BFB3547FEBD6 /* DMSans.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2941F735856C3358B60B0E6E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60E1F741B128E63395374880 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		6DBA243DF16C3583F03DF591 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		2F775738B21B66F25E92DFC0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D542C80AEA7618D12E3BD8B /* Elbert */;
+			targetProxy = 9C065850694AC0787C6EF3BF /* PBXContainerItemProxy */;
+		};
+		9A6E2005C2BA9C8E9429EB3C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4D542C80AEA7618D12E3BD8B /* Elbert */;
+			targetProxy = A285AE0ED40A9A4350B4CC9B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		11A478BF1F5726CEF35D3A45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.calebl.elbert.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Elbert.app/Elbert";
+			};
+			name = Release;
+		};
+		4156064627FDE9D4CE40C85F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.calebl.elbert.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Elbert;
+			};
+			name = Debug;
+		};
+		5E44B8C82D503AC6D38628A8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		71815C04FB7B87D5F3F36736 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Elbert/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.calebl.elbert;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		870DA93C5255B32CFE79D1BE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Elbert/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.calebl.elbert;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B3AE1C50DA596F821BD9506C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		BF47E8BA207B259CF69ACFE6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.calebl.elbert.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Elbert.app/Elbert";
+			};
+			name = Debug;
+		};
+		D15187A4894FEEAC571AB281 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.calebl.elbert.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Elbert;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		50897324BEE91077173CCA34 /* Build configuration list for PBXNativeTarget "ElbertTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF47E8BA207B259CF69ACFE6 /* Debug */,
+				11A478BF1F5726CEF35D3A45 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		8DA4284FFAAD9EAFA21AB0C2 /* Build configuration list for PBXNativeTarget "Elbert" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				870DA93C5255B32CFE79D1BE /* Debug */,
+				71815C04FB7B87D5F3F36736 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9AB69DA4DE40C6C98EF17933 /* Build configuration list for PBXProject "Elbert" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E44B8C82D503AC6D38628A8 /* Debug */,
+				B3AE1C50DA596F821BD9506C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		E365B47D45B2E04144AC17C1 /* Build configuration list for PBXNativeTarget "ElbertUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4156064627FDE9D4CE40C85F /* Debug */,
+				D15187A4894FEEAC571AB281 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		353F4D43063689967DA8E6E7 /* XCRemoteSwiftPackageReference "swift-fsrs" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-spaced-repetition/swift-fsrs";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		FF0D51918099DC4CB23C122E /* FSRS */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 353F4D43063689967DA8E6E7 /* XCRemoteSwiftPackageReference "swift-fsrs" */;
+			productName = FSRS;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 0B9BFE453F1F0D19D5440374 /* Project object */;
+}
