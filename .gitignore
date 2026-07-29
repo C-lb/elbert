@@ -41,3 +41,6 @@ DerivedData/
 build/
 *.ipa
 *.dSYM.zip
+
+# Local Swift packages
+ios/Packages/*/.build/

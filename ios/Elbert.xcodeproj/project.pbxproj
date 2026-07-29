@@ -11,6 +11,7 @@
 		07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D52B715D527791D66B8B78C6 /* ElbertUITests.swift */; };
 		1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BF213188459A5C1BBB44AA /* ModelsTests.swift */; };
 		1D9A490A881552337C9F124A /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A332AEF634FF9758F7A5DF20 /* Buttons.swift */; };
+		27277E369170503A8FA823BA /* SchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93B21999F54CBF01FCA7D /* SchedulerTests.swift */; };
 		3BB50B1455929D5ADB5DDAF9 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA04ED33542FCF20E3D5343 /* Feedback.swift */; };
 		4175C333970EA3210273F9BC /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F363816233BAFC1E3359D50 /* Deck.swift */; };
 		52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */; };
@@ -18,6 +19,7 @@
 		5E086AFD438D3A93E385A912 /* DesignGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F0C274950BE16D9C5FD03C5 /* DesignGallery.swift */; };
 		625C4F2D7956947EC42FD657 /* Persistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = D574077B80F4101BBADF7F4A /* Persistence.swift */; };
 		65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E7A2E10B27330E83314BDB /* ElbertApp.swift */; };
+		6646697E4DA338A10F26B7F9 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B5DCF5F283A122D61DEF3B /* Scheduler.swift */; };
 		69C20D6616E2BE848262F730 /* MediaAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7820516C33491D483706A7AC /* MediaAsset.swift */; };
 		7A03126B46C15805D2D918F7 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2389E116B6171C4F8ABAD15E /* Note.swift */; };
 		7EA1F2FA24A68D335B55467A /* Enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5710FA75DDD0CB5C29976B81 /* Enums.swift */; };
@@ -30,7 +32,7 @@
 		F1946F9891A405669D9A51B3 /* CardsFromNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0FC0A25782553AC9D95297D /* CardsFromNote.swift */; };
 		F1A9A1F0E888A7390930AB4D /* Cloze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BF6DFC83464AE4483F8C /* Cloze.swift */; };
 		F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEF47AD555DC9FDFA26DA12 /* Theme.swift */; };
-		F74066CD6142ED8CA4510EC3 /* FSRS in Frameworks */ = {isa = PBXBuildFile; productRef = FF0D51918099DC4CB23C122E /* FSRS */; };
+		F74066CD6142ED8CA4510EC3 /* FSRSKit in Frameworks */ = {isa = PBXBuildFile; productRef = 022FB4FF06F68601E4A94F82 /* FSRSKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +56,7 @@
 		004477F5E274521831ABE4CA /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemTests.swift; sourceTree = "<group>"; };
 		01D3BF6DFC83464AE4483F8C /* Cloze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cloze.swift; sourceTree = "<group>"; };
+		07B5DCF5F283A122D61DEF3B /* Scheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Scheduler.swift; sourceTree = "<group>"; };
 		0FEFB9CA951FE21A831C31F1 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		1BA04ED33542FCF20E3D5343 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		1D7A3C8E5504FD6E0572EB9E /* CardsFromNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsFromNoteTests.swift; sourceTree = "<group>"; };
@@ -75,7 +78,9 @@
 		A332AEF634FF9758F7A5DF20 /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
 		B83C1AB0C3F6D61B1310EB77 /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		BA967F1A12915216E9A8F350 /* ClozeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClozeTests.swift; sourceTree = "<group>"; };
+		BE2A76951E4E9524352AF55C /* FSRSKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = FSRSKit; path = Packages/FSRSKit; sourceTree = SOURCE_ROOT; };
 		BEC558650956D409A959140F /* DMSans.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DMSans.ttf; sourceTree = "<group>"; };
+		C7E93B21999F54CBF01FCA7D /* SchedulerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchedulerTests.swift; sourceTree = "<group>"; };
 		D0FC0A25782553AC9D95297D /* CardsFromNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsFromNote.swift; sourceTree = "<group>"; };
 		D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B715D527791D66B8B78C6 /* ElbertUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertUITests.swift; sourceTree = "<group>"; };
@@ -88,7 +93,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F74066CD6142ED8CA4510EC3 /* FSRS in Frameworks */,
+				F74066CD6142ED8CA4510EC3 /* FSRSKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,6 +108,7 @@
 				01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */,
 				9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */,
 				25BF213188459A5C1BBB44AA /* ModelsTests.swift */,
+				C7E93B21999F54CBF01FCA7D /* SchedulerTests.swift */,
 			);
 			path = ElbertTests;
 			sourceTree = "<group>";
@@ -151,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				8F978846838EF3ED0D51D95D /* Elbert */,
+				FA6F021DA0D1B3D3AD20A306 /* Packages */,
 				9C013B68BCF40C69B8354F56 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -191,6 +198,7 @@
 				87B26974EF8AF821EF15AAB4 /* .gitkeep */,
 				D0FC0A25782553AC9D95297D /* CardsFromNote.swift */,
 				01D3BF6DFC83464AE4483F8C /* Cloze.swift */,
+				07B5DCF5F283A122D61DEF3B /* Scheduler.swift */,
 			);
 			path = Engine;
 			sourceTree = "<group>";
@@ -211,6 +219,14 @@
 				BEC558650956D409A959140F /* DMSans.ttf */,
 			);
 			path = Fonts;
+			sourceTree = "<group>";
+		};
+		FA6F021DA0D1B3D3AD20A306 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				BE2A76951E4E9524352AF55C /* FSRSKit */,
+			);
+			path = Packages;
 			sourceTree = "<group>";
 		};
 		FABD692EF407C7F4DD4C2218 /* Design */ = {
@@ -262,7 +278,7 @@
 			);
 			name = Elbert;
 			packageProductDependencies = (
-				FF0D51918099DC4CB23C122E /* FSRS */,
+				022FB4FF06F68601E4A94F82 /* FSRSKit */,
 			);
 			productName = Elbert;
 			productReference = E7C389F69D8800A969A18FEF /* Elbert.app */;
@@ -313,7 +329,7 @@
 			mainGroup = 6EF0D61377BD5F1C30247657;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				353F4D43063689967DA8E6E7 /* XCRemoteSwiftPackageReference "swift-fsrs" */,
+				C01068A66E149FE66CAE5A47 /* XCLocalSwiftPackageReference "Packages/FSRSKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9C013B68BCF40C69B8354F56 /* Products */;
@@ -365,6 +381,7 @@
 				7A03126B46C15805D2D918F7 /* Note.swift in Sources */,
 				625C4F2D7956947EC42FD657 /* Persistence.swift in Sources */,
 				89026FC8EC39DBFF16D1D5BC /* Review.swift in Sources */,
+				6646697E4DA338A10F26B7F9 /* Scheduler.swift in Sources */,
 				F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */,
 				DF896C3BD47A0C5110EC53BF /* Typography.swift in Sources */,
 			);
@@ -379,6 +396,7 @@
 				52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */,
 				9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */,
 				1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */,
+				27277E369170503A8FA823BA /* SchedulerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -668,22 +686,17 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		353F4D43063689967DA8E6E7 /* XCRemoteSwiftPackageReference "swift-fsrs" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/open-spaced-repetition/swift-fsrs";
-			requirement = {
-				kind = exactVersion;
-				version = 5.0.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		C01068A66E149FE66CAE5A47 /* XCLocalSwiftPackageReference "Packages/FSRSKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/FSRSKit;
 		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FF0D51918099DC4CB23C122E /* FSRS */ = {
+		022FB4FF06F68601E4A94F82 /* FSRSKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 353F4D43063689967DA8E6E7 /* XCRemoteSwiftPackageReference "swift-fsrs" */;
-			productName = FSRS;
+			productName = FSRSKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

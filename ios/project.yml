@@ -17,12 +17,12 @@ settings:
     DEAD_CODE_STRIPPING: YES
 
 packages:
-  FSRS:
-    url: https://github.com/open-spaced-repetition/swift-fsrs
-    # Exact, not `from:`. The FSRS algorithm generation is a deliberate decision
-    # (see spec section 6, decided in task 6), so a Packages > Update must never
-    # move it silently. 5.0.0 is FSRS-5; FSRS-6 lives only on an untagged main.
-    exactVersion: 5.0.0
+  # swift-fsrs is not depended on directly. It declares a class `FSRS` inside a
+  # module `FSRS`, which makes `FSRS.Card` unreachable from any module that has
+  # its own `Card` to disambiguate against, and Elbert has one. FSRSKit wraps it
+  # and is also where the untagged upstream revision is pinned.
+  FSRSKit:
+    path: Packages/FSRSKit
 
 targets:
   Elbert:
@@ -37,7 +37,7 @@ targets:
       - path: Elbert/Resources
         buildPhase: resources
     dependencies:
-      - package: FSRS
+      - package: FSRSKit
     info:
       path: Elbert/Info.plist
       properties:
