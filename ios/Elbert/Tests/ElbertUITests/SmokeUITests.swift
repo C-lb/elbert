@@ -1,0 +1,97 @@
+import XCTest
+
+/// Task 16, the end-to-end smoke walk: create a deck from scratch, add a note to it, study it,
+/// and rate the card. Where the task-10-through-14 suites each exercise one screen against the
+/// seeded sample data, this one strings the whole path together against a deck that did not exist
+/// a moment ago, which is the thing a brand-new user actually does first.
+///
+/// Launched clean, not with `-seedSampleData`: seeding is unrelated to what this walk is proving,
+/// and a from-scratch deck is unambiguous to find (`containing 'Smoke test deck'` cannot collide
+/// with anything the seed produces).
+final class SmokeUITests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        continueAfterFailure = false
+    }
+
+    func testCreateDeckAddNoteStudyAndRate() {
+        let app = XCUIApplication()
+        app.launch()
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 15))
+
+        let deckName = "Smoke test deck"
+
+        // MARK: create deck
+
+        selectTab(app, "Decks", heading: "Decks")
+
+        let field = app.textFields["Deck name"]
+        tap(app.buttons["New deck"], untilExists: field, "the naming alert never opened")
+        field.typeText(deckName)
+        // Writes once: this creates the deck, so it is a single tap and an assertion on the
+        // result rather than the re-tapping helper.
+        app.buttons["Create"].tap()
+
+        let deckRow = app.buttons.containing(NSPredicate(format: "label CONTAINS %@", deckName)).firstMatch
+        XCTAssertTrue(deckRow.waitForExistence(timeout: 5), "the new deck never appeared on Decks")
+
+        // MARK: add a note
+
+        // A brand-new deck is empty, so (like DeckListScreen's empty state) DeckNotesScreen shows
+        // "New note" twice: once in the toolbar, once as the empty-state action. Both fire the same
+        // closure, so `.firstMatch` is fine — `app.buttons["New note"]` alone is ambiguous here in a
+        // way it is not against the seeded decks the other suite uses, which already have notes.
+        let newNote = app.buttons.matching(NSPredicate(format: "label == 'New note'")).firstMatch
+        tap(deckRow, untilExists: newNote, "never landed inside the new deck")
+        tap(newNote, untilExists: app.navigationBars["New note"], "the editor never opened")
+
+        XCTAssertFalse(app.buttons["Save"].isEnabled, "Save should start disabled on an empty note")
+
+        app.textFields["The word or question"].tap()
+        app.typeText("Smoke")
+        app.textFields["The answer"].tap()
+        app.typeText("Test")
+
+        XCTAssertTrue(app.buttons["Save"].isEnabled)
+        // Writes once: saving the note.
+        app.buttons["Save"].tap()
+
+        XCTAssertTrue(
+            app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Smoke'"))
+                .firstMatch.waitForExistence(timeout: 5),
+            "the new note never appeared in the deck"
+        )
+
+        // MARK: study it
+
+        selectTab(app, "Study", heading: "Study")
+
+        tap(
+            app.buttons["Start studying"],
+            untilExists: app.buttons["Show answer"],
+            "the session never started"
+        )
+
+        let good = app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Good'")).firstMatch
+        tap(app.buttons["Show answer"], untilExists: good, "the answer never showed")
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Test'")).firstMatch.exists,
+                      "the answer side never showed the note's answer")
+
+        // MARK: rate it
+
+        // Writes once: this records the review. A second tap here would grade the card twice.
+        good.tap()
+
+        // Either another card comes up (Show answer again) or the session is done; either one
+        // proves the rating was recorded and the queue moved on. A predicate evaluated against
+        // `app` itself, rather than one fixed element, is what lets this wait on an "or" instead
+        // of committing to a single outcome ahead of time.
+        let sessionDone = headingElement(app, "Session done")
+        let nextCard = app.buttons["Show answer"]
+        let movedOn = expectation(
+            for: NSPredicate { _, _ in sessionDone.exists || nextCard.exists },
+            evaluatedWith: app
+        )
+        wait(for: [movedOn], timeout: 10)
+    }
+}

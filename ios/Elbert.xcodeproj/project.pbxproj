@@ -49,6 +49,7 @@
 		C4C7383C4B03DB00F4A1D1DE /* NoteDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D3F2529564B28F2C1D7E1D4 /* NoteDraft.swift */; };
 		CFFCDE69A2971100CB185F55 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA003E187A670B9A428A721 /* SettingsTests.swift */; };
 		D12A70BE444795F9E852DF22 /* SampleDecks.json in Resources */ = {isa = PBXBuildFile; fileRef = 95F8074CDCCDEB3A62DA5BA5 /* SampleDecks.json */; };
+		D4171AC8952D568BAF2A8B40 /* SmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6147F7B6E091108EF6E835F9 /* SmokeUITests.swift */; };
 		D6670FD9A263668B12C70E05 /* DeckNotesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8257C5A89D29F6CDC8B1293E /* DeckNotesScreen.swift */; };
 		D695BA23B249C10C83209B97 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 004477F5E274521831ABE4CA /* Card.swift */; };
 		DC1FFB9D205388592C6295D3 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BF4C020B737128702A1A9C5 /* RootView.swift */; };
@@ -103,6 +104,7 @@
 		52E7A2E10B27330E83314BDB /* ElbertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertApp.swift; sourceTree = "<group>"; };
 		5710FA75DDD0CB5C29976B81 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		5DA003E187A670B9A428A721 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
+		6147F7B6E091108EF6E835F9 /* SmokeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeUITests.swift; sourceTree = "<group>"; };
 		721983C13B318479BCDA23A4 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		74AEBC7E6222AFF06E49666B /* DeckSettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckSettingsScreen.swift; sourceTree = "<group>"; };
 		7820516C33491D483706A7AC /* MediaAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaAsset.swift; sourceTree = "<group>"; };
@@ -250,6 +252,7 @@
 			children = (
 				08546F5849952E1360AFEA37 /* DeckFlowUITests.swift */,
 				D52B715D527791D66B8B78C6 /* ElbertUITests.swift */,
+				6147F7B6E091108EF6E835F9 /* SmokeUITests.swift */,
 				AEE9B4E0D4700D75DA22AF35 /* UITestSupport.swift */,
 			);
 			path = ElbertUITests;
@@ -443,6 +446,7 @@
 			files = (
 				632AC260A9547C8140C413BE /* DeckFlowUITests.swift in Sources */,
 				07DD483AA93C7D048E649732 /* ElbertUITests.swift in Sources */,
+				D4171AC8952D568BAF2A8B40 /* SmokeUITests.swift in Sources */,
 				1E17230648BEBB6015A4D177 /* UITestSupport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
