@@ -55,12 +55,11 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
-        # CloudKit is off until the iCloud container exists in the developer account
-        # (spec section 10, item 1). Signing against an unregistered container fails, so
-        # the entitlement cannot be attached early "just in case". To turn sync on,
-        # uncomment both lines below and regenerate with `xcodegen generate`.
-        # CODE_SIGN_ENTITLEMENTS: Elbert/Elbert.entitlements
-        # SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) ELBERT_CLOUDKIT"
+        DEVELOPMENT_TEAM: AAKNTD24WB
+        # CloudKit on since 2026-08-02: iCloud.com.calebl.elbert is registered in the
+        # developer account and assigned to the com.calebl.elbert App ID.
+        CODE_SIGN_ENTITLEMENTS: Elbert/Elbert.entitlements
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) ELBERT_CLOUDKIT"
 
   ElbertTests:
     type: bundle.unit-test
@@ -73,6 +72,10 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.calebl.elbert.tests
         GENERATE_INFOPLIST_FILE: YES
+        # Must track the app target's flag: ModelsTests gates CloudKit-sensitive
+        # assertions on #if !ELBERT_CLOUDKIT, and the guard only folds correctly
+        # when the test target compiles under the same condition.
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) ELBERT_CLOUDKIT"
 
   ElbertUITests:
     type: bundle.ui-testing

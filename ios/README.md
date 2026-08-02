@@ -40,21 +40,22 @@ are renamed on the way out. Nothing in the app imports `FSRS` directly.
 The library defaults to the 19-weight FSRS-5 vector and refuses to migrate 19 to 21 on its own, so
 FSRS-6 is asked for by name via `FSRSWeights.v6`.
 
-## Turning CloudKit sync on
+## CloudKit sync
 
-Sync is written but compiled out. `Persistence` opens a local store and reports
-`StoreHealth.localOnly`, because signing a build against an iCloud container that is not
-registered in the developer account fails outright, so the entitlement cannot be attached
-speculatively.
+ON since 2026-08-02: the container `iCloud.com.calebl.elbert` is registered against the
+`com.calebl.elbert` app id (team AAKNTD24WB, same account as Remy and Blocks), and the
+`CODE_SIGN_ENTITLEMENTS` + `SWIFT_ACTIVE_COMPILATION_CONDITIONS: ELBERT_CLOUDKIT` settings
+are live in `project.yml`.
 
-To enable it:
+The `ELBERT_CLOUDKIT` compilation condition must be set on BOTH the `Elbert` target and
+`ElbertTests` — the unit tests gate CloudKit-sensitive assertions on `#if !ELBERT_CLOUDKIT`,
+and the guard only folds correctly when the test target compiles under the same flag. Turning
+the app flag on without the test flag makes `healthReflectsNoCloudKit` fail, because the test
+then asserts local-only against an app that genuinely attempts CloudKit.
 
-1. In the Apple developer console, register the iCloud container `iCloud.com.calebl.elbert`
-   against the `com.calebl.elbert` app id, with the CloudKit capability on. Same account as
-   Remy and Blocks.
-2. In `project.yml`, uncomment the two lines under the `Elbert` target's `settings.base`:
-   `CODE_SIGN_ENTITLEMENTS` and `SWIFT_ACTIVE_COMPILATION_CONDITIONS`.
-3. `xcodegen generate`, then build to a real device. The simulator does not exercise the mirror.
+The simulator builds and tests fine with the flag on, but does not exercise the mirror —
+container config succeeds locally and `Persistence.health` reports `.syncing` without any
+data actually leaving the device. Only a real device on an iCloud account proves sync.
 
 `Elbert/Elbert.entitlements` is already written and requests only the private database. If the
 container id ever changes it has to change in three places: that file, `Persistence.cloudKitContainerID`,
