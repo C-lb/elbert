@@ -8,6 +8,11 @@ import XCTest
 /// Launched clean, not with `-seedSampleData`: seeding is unrelated to what this walk is proving,
 /// and a from-scratch deck is unambiguous to find (`containing 'Smoke test deck'` cannot collide
 /// with anything the seed produces).
+///
+/// The note's term and definition are deliberately words that appear nowhere else in the app's
+/// chrome (not in the deck name, not in any screen title or button label), so a static-text
+/// assertion on them can only be satisfied by the note itself actually having saved and rendered
+/// — not by some other label on screen that happens to share a substring.
 final class SmokeUITests: XCTestCase {
     override func setUp() {
         super.setUp()
@@ -17,7 +22,9 @@ final class SmokeUITests: XCTestCase {
     func testCreateDeckAddNoteStudyAndRate() {
         let app = XCUIApplication()
         app.launch()
-        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 15))
+        // Not gated on the tab bar: the bar is up before the root screen has finished settling,
+        // so this waits for the heading to actually read "Home" the way `testAppLaunches` does.
+        XCTAssertTrue(headingElement(app, "Home").waitForExistence(timeout: 15), "never settled on Home")
 
         let deckName = "Smoke test deck"
 
@@ -47,17 +54,23 @@ final class SmokeUITests: XCTestCase {
 
         XCTAssertFalse(app.buttons["Save"].isEnabled, "Save should start disabled on an empty note")
 
+        let term = "Chlorophyll pigment"
+        let definition = "Captures light energy for photosynthesis"
+
         app.textFields["The word or question"].tap()
-        app.typeText("Smoke")
+        app.typeText(term)
         app.textFields["The answer"].tap()
-        app.typeText("Test")
+        app.typeText(definition)
 
         XCTAssertTrue(app.buttons["Save"].isEnabled)
         // Writes once: saving the note.
         app.buttons["Save"].tap()
 
+        // `term` matches nothing else on screen (not the deck name, not any button or heading),
+        // so this can only pass once the note row itself has rendered — it is not satisfied by,
+        // say, the "Smoke test deck" heading that is already on screen at this point.
         XCTAssertTrue(
-            app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Smoke'"))
+            app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", term))
                 .firstMatch.waitForExistence(timeout: 5),
             "the new note never appeared in the deck"
         )
@@ -74,8 +87,10 @@ final class SmokeUITests: XCTestCase {
 
         let good = app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Good'")).firstMatch
         tap(app.buttons["Show answer"], untilExists: good, "the answer never showed")
-        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Test'")).firstMatch.exists,
-                      "the answer side never showed the note's answer")
+        XCTAssertTrue(
+            app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", definition)).firstMatch.exists,
+            "the answer side never showed the note's answer"
+        )
 
         // MARK: rate it
 
