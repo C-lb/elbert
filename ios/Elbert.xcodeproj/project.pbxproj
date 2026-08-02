@@ -21,6 +21,7 @@
 		32E95D98B3C3A7AE5F93091E /* NoteDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB426315837D6D00765AE84 /* NoteDraftTests.swift */; };
 		3BB50B1455929D5ADB5DDAF9 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA04ED33542FCF20E3D5343 /* Feedback.swift */; };
 		4175C333970EA3210273F9BC /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F363816233BAFC1E3359D50 /* Deck.swift */; };
+		450D9B55EB6BFA79886AF996 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50A3DF54D54AB16756504518 /* Assets.xcassets */; };
 		504F941EAD5A4C9A9A0E6145 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2FCB1FE0F5FCA780B8C577D /* SampleData.swift */; };
 		524720213C21B6663CDBE157 /* AppearanceMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9A040E80FB42FCABCF1CF7 /* AppearanceMode.swift */; };
 		52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */; };
@@ -101,6 +102,7 @@
 		35EB6287CAD0D74B044F387B /* DeckListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckListScreen.swift; sourceTree = "<group>"; };
 		38BA9DC845FD3DAF66AF7EFB /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		4718063620CAC621ECF122C3 /* SampleDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataTests.swift; sourceTree = "<group>"; };
+		50A3DF54D54AB16756504518 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		52E7A2E10B27330E83314BDB /* ElbertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertApp.swift; sourceTree = "<group>"; };
 		5710FA75DDD0CB5C29976B81 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		5DA003E187A670B9A428A721 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
@@ -261,6 +263,7 @@
 		8F978846838EF3ED0D51D95D /* Elbert */ = {
 			isa = PBXGroup;
 			children = (
+				50A3DF54D54AB16756504518 /* Assets.xcassets */,
 				7DD961DB0AF0192CB0C3C6AA /* App */,
 				FABD692EF407C7F4DD4C2218 /* Design */,
 				9AC9F255CA32D919A5648858 /* Engine */,
@@ -433,6 +436,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				450D9B55EB6BFA79886AF996 /* Assets.xcassets in Resources */,
 				842E5311EA48BFB3547FEBD6 /* DMSans.ttf in Resources */,
 				D12A70BE444795F9E852DF22 /* SampleDecks.json in Resources */,
 			);
