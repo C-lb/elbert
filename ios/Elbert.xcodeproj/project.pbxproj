@@ -16,13 +16,13 @@
 		1D9A490A881552337C9F124A /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A332AEF634FF9758F7A5DF20 /* Buttons.swift */; };
 		1E17230648BEBB6015A4D177 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE9B4E0D4700D75DA22AF35 /* UITestSupport.swift */; };
 		27277E369170503A8FA823BA /* SchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93B21999F54CBF01FCA7D /* SchedulerTests.swift */; };
-		29DF596F358384E9140DA5E2 /* PlaceholderScreens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E1E87115EB5C35A32092012 /* PlaceholderScreens.swift */; };
 		2D6E1354534B004848692BA1 /* StudyScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8075B1F1A7C3D3A67312187D /* StudyScreen.swift */; };
 		2DCEE9BB512778B4CF30AE11 /* HouseScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C098ED950F5833D92667649 /* HouseScreen.swift */; };
 		32E95D98B3C3A7AE5F93091E /* NoteDraftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CB426315837D6D00765AE84 /* NoteDraftTests.swift */; };
 		3BB50B1455929D5ADB5DDAF9 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BA04ED33542FCF20E3D5343 /* Feedback.swift */; };
 		4175C333970EA3210273F9BC /* Deck.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F363816233BAFC1E3359D50 /* Deck.swift */; };
 		504F941EAD5A4C9A9A0E6145 /* SampleData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2FCB1FE0F5FCA780B8C577D /* SampleData.swift */; };
+		524720213C21B6663CDBE157 /* AppearanceMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA9A040E80FB42FCABCF1CF7 /* AppearanceMode.swift */; };
 		52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */; };
 		567703E5CF0B7C1371CB2E9C /* Icons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2E2E2EF0E6E14538CA5D10 /* Icons.swift */; };
 		58CA3ADFDB39CEF1C72932DD /* QueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 061CAD07B43B53B76A33751A /* QueueTests.swift */; };
@@ -32,6 +32,7 @@
 		632AC260A9547C8140C413BE /* DeckFlowUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08546F5849952E1360AFEA37 /* DeckFlowUITests.swift */; };
 		65873447D57F7B97602F77B5 /* ElbertApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E7A2E10B27330E83314BDB /* ElbertApp.swift */; };
 		6646697E4DA338A10F26B7F9 /* Scheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07B5DCF5F283A122D61DEF3B /* Scheduler.swift */; };
+		69273F6B1952F89C0E6059D8 /* SyncStatusDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C353264175FB2BEECE4741 /* SyncStatusDisplay.swift */; };
 		69C20D6616E2BE848262F730 /* MediaAsset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7820516C33491D483706A7AC /* MediaAsset.swift */; };
 		710D31C839611FEC5ED15D31 /* DeckSettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74AEBC7E6222AFF06E49666B /* DeckSettingsScreen.swift */; };
 		71C10A1B970BFD08DCAFC63A /* NewCardCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6B977B4BEAC451F6FC0C3B8 /* NewCardCounter.swift */; };
@@ -43,8 +44,10 @@
 		8EB8DC95F62661271A5F8155 /* ShellTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF095938D3E7CEB6034742C9 /* ShellTests.swift */; };
 		9062FF5CFBFF44F8C706B09C /* HouseTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F896AF891F39904CB842B8 /* HouseTabBar.swift */; };
 		9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */; };
+		A6C0CDD6F6AA91B767B10139 /* SettingsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 721983C13B318479BCDA23A4 /* SettingsScreen.swift */; };
 		B25ECF029DD73A9D914C4E1B /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB5A836EFE25CC74E2DD333 /* HomeScreen.swift */; };
 		C4C7383C4B03DB00F4A1D1DE /* NoteDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D3F2529564B28F2C1D7E1D4 /* NoteDraft.swift */; };
+		CFFCDE69A2971100CB185F55 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA003E187A670B9A428A721 /* SettingsTests.swift */; };
 		D12A70BE444795F9E852DF22 /* SampleDecks.json in Resources */ = {isa = PBXBuildFile; fileRef = 95F8074CDCCDEB3A62DA5BA5 /* SampleDecks.json */; };
 		D6670FD9A263668B12C70E05 /* DeckNotesScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8257C5A89D29F6CDC8B1293E /* DeckNotesScreen.swift */; };
 		D695BA23B249C10C83209B97 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = 004477F5E274521831ABE4CA /* Card.swift */; };
@@ -89,16 +92,18 @@
 		1BA04ED33542FCF20E3D5343 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		1BF4C020B737128702A1A9C5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		1D7A3C8E5504FD6E0572EB9E /* CardsFromNoteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardsFromNoteTests.swift; sourceTree = "<group>"; };
-		1E1E87115EB5C35A32092012 /* PlaceholderScreens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderScreens.swift; sourceTree = "<group>"; };
 		1EF15A0AC138CED597573830 /* Review.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Review.swift; sourceTree = "<group>"; };
 		1FAAC81112D995D76EF6B27E /* .gitkeep */ = {isa = PBXFileReference; path = .gitkeep; sourceTree = "<group>"; };
 		2389E116B6171C4F8ABAD15E /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		25BF213188459A5C1BBB44AA /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
+		29C353264175FB2BEECE4741 /* SyncStatusDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusDisplay.swift; sourceTree = "<group>"; };
 		35EB6287CAD0D74B044F387B /* DeckListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckListScreen.swift; sourceTree = "<group>"; };
 		38BA9DC845FD3DAF66AF7EFB /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		4718063620CAC621ECF122C3 /* SampleDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataTests.swift; sourceTree = "<group>"; };
 		52E7A2E10B27330E83314BDB /* ElbertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertApp.swift; sourceTree = "<group>"; };
 		5710FA75DDD0CB5C29976B81 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
+		5DA003E187A670B9A428A721 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
+		721983C13B318479BCDA23A4 /* SettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsScreen.swift; sourceTree = "<group>"; };
 		74AEBC7E6222AFF06E49666B /* DeckSettingsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckSettingsScreen.swift; sourceTree = "<group>"; };
 		7820516C33491D483706A7AC /* MediaAsset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaAsset.swift; sourceTree = "<group>"; };
 		7F0C274950BE16D9C5FD03C5 /* DesignGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignGallery.swift; sourceTree = "<group>"; };
@@ -133,6 +138,7 @@
 		D574077B80F4101BBADF7F4A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
 		E6B977B4BEAC451F6FC0C3B8 /* NewCardCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCardCounter.swift; sourceTree = "<group>"; };
 		E7C389F69D8800A969A18FEF /* Elbert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Elbert.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		EA9A040E80FB42FCABCF1CF7 /* AppearanceMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceMode.swift; sourceTree = "<group>"; };
 		F7E487EE56C6A64B65118C9D /* EditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorSheet.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -160,6 +166,7 @@
 				061CAD07B43B53B76A33751A /* QueueTests.swift */,
 				4718063620CAC621ECF122C3 /* SampleDataTests.swift */,
 				C7E93B21999F54CBF01FCA7D /* SchedulerTests.swift */,
+				5DA003E187A670B9A428A721 /* SettingsTests.swift */,
 				CF095938D3E7CEB6034742C9 /* ShellTests.swift */,
 				0A6EE6DD8B368CACDA3D39EE /* StudySessionTests.swift */,
 			);
@@ -187,8 +194,8 @@
 				8CB5A836EFE25CC74E2DD333 /* HomeScreen.swift */,
 				0C098ED950F5833D92667649 /* HouseScreen.swift */,
 				87F896AF891F39904CB842B8 /* HouseTabBar.swift */,
-				1E1E87115EB5C35A32092012 /* PlaceholderScreens.swift */,
 				1BF4C020B737128702A1A9C5 /* RootView.swift */,
+				721983C13B318479BCDA23A4 /* SettingsScreen.swift */,
 				8075B1F1A7C3D3A67312187D /* StudyScreen.swift */,
 			);
 			path = Screens;
@@ -207,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				A1971F822C159FCBA0FAD731 /* .gitkeep */,
+				EA9A040E80FB42FCABCF1CF7 /* AppearanceMode.swift */,
 				004477F5E274521831ABE4CA /* Card.swift */,
 				7F363816233BAFC1E3359D50 /* Deck.swift */,
 				5710FA75DDD0CB5C29976B81 /* Enums.swift */,
@@ -215,6 +223,7 @@
 				D574077B80F4101BBADF7F4A /* Persistence.swift */,
 				1EF15A0AC138CED597573830 /* Review.swift */,
 				A2FCB1FE0F5FCA780B8C577D /* SampleData.swift */,
+				29C353264175FB2BEECE4741 /* SyncStatusDisplay.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -443,6 +452,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1214A497C7D1842FC7215061 /* AppTab.swift in Sources */,
+				524720213C21B6663CDBE157 /* AppearanceMode.swift in Sources */,
 				1D9A490A881552337C9F124A /* Buttons.swift in Sources */,
 				D695BA23B249C10C83209B97 /* Card.swift in Sources */,
 				F1946F9891A405669D9A51B3 /* CardsFromNote.swift in Sources */,
@@ -465,14 +475,15 @@
 				7A03126B46C15805D2D918F7 /* Note.swift in Sources */,
 				C4C7383C4B03DB00F4A1D1DE /* NoteDraft.swift in Sources */,
 				625C4F2D7956947EC42FD657 /* Persistence.swift in Sources */,
-				29DF596F358384E9140DA5E2 /* PlaceholderScreens.swift in Sources */,
 				070A26CD92F6EB70A7E84897 /* Queue.swift in Sources */,
 				89026FC8EC39DBFF16D1D5BC /* Review.swift in Sources */,
 				DC1FFB9D205388592C6295D3 /* RootView.swift in Sources */,
 				504F941EAD5A4C9A9A0E6145 /* SampleData.swift in Sources */,
 				6646697E4DA338A10F26B7F9 /* Scheduler.swift in Sources */,
+				A6C0CDD6F6AA91B767B10139 /* SettingsScreen.swift in Sources */,
 				2D6E1354534B004848692BA1 /* StudyScreen.swift in Sources */,
 				E45C61102E72BDE24AB92A3F /* StudySession.swift in Sources */,
+				69273F6B1952F89C0E6059D8 /* SyncStatusDisplay.swift in Sources */,
 				F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */,
 				DF896C3BD47A0C5110EC53BF /* Typography.swift in Sources */,
 			);
@@ -491,6 +502,7 @@
 				58CA3ADFDB39CEF1C72932DD /* QueueTests.swift in Sources */,
 				DC783A188E8B40373124A7F9 /* SampleDataTests.swift in Sources */,
 				27277E369170503A8FA823BA /* SchedulerTests.swift in Sources */,
+				CFFCDE69A2971100CB185F55 /* SettingsTests.swift in Sources */,
 				8EB8DC95F62661271A5F8155 /* ShellTests.swift in Sources */,
 				0F368ED4194D9D3F395012BA /* StudySessionTests.swift in Sources */,
 			);

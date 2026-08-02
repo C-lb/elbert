@@ -21,6 +21,15 @@ struct RootView: View {
 
     @State private var toasts = ToastCentre()
 
+    /// The appearance choice from Settings (task 15). `@AppStorage` publishes through the
+    /// environment, so flipping it in Settings re-renders this view and `.preferredColorScheme`
+    /// picks up the new value on the same frame — no relaunch, no foreground/background cycle.
+    @AppStorage(AppearanceMode.storageKey) private var appearanceModeRaw = AppearanceMode.system.rawValue
+
+    private var appearanceMode: AppearanceMode {
+        AppearanceMode(rawValue: appearanceModeRaw) ?? .system
+    }
+
     var body: some View {
         TabView(selection: $selection) {
             ForEach(AppTab.allCases) { tab in
@@ -41,6 +50,10 @@ struct RootView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             HouseTabBar(selection: $selection)
         }
+        // Applied before `.housePalette()`, so the palette resolves off the overridden scheme
+        // rather than the system's, and `nil` (System) hands the environment's `\.colorScheme`
+        // straight through unchanged.
+        .preferredColorScheme(appearanceMode.colorScheme)
         .housePalette()
         .houseToast(toasts)
         .environment(toasts)

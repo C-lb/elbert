@@ -18,6 +18,9 @@ enum Icon: String, CaseIterable, Sendable {
     case dismiss = "xmark"
     case stats = "chart.bar"
     case synced = "checkmark.icloud"
+    /// iCloud sync is off. Distinct from `synced` rather than a dimmed copy of it, so the two
+    /// states cannot be told apart only by colour.
+    case cloudOff = "icloud.slash"
     /// Semantic, for a warning notice. Distinct from `dismiss` on purpose: a red xmark
     /// beside a grey xmark dismiss button is two identical glyphs meaning different things.
     case caution = "exclamationmark.triangle"
@@ -29,12 +32,13 @@ enum Icon: String, CaseIterable, Sendable {
 
     /// The solid counterpart, used for the current tab and for pressed state.
     ///
-    /// Four of the wave-1 glyphs have no `.fill` variant in SF Symbols (`plus`, `pencil`,
-    /// `checkmark`, `xmark` are strokes with nothing to fill), so they resolve back to the
-    /// outline. None of them appear in the tab bar, where the fill swap is the state signal.
+    /// Several glyphs have no `.fill` variant worth using: `plus`, `pencil`, `checkmark`,
+    /// `xmark` are strokes with nothing to fill in SF Symbols, and `icloud.slash` is a status
+    /// glyph that is never shown filled, so all five resolve back to the outline. None of them
+    /// appear in the tab bar, where the fill swap is the state signal.
     var filledSymbol: String {
         switch self {
-        case .add, .edit, .confirm, .dismiss: rawValue
+        case .add, .edit, .confirm, .dismiss, .cloudOff: rawValue
         default: rawValue + ".fill"
         }
     }
@@ -60,6 +64,7 @@ enum Icon: String, CaseIterable, Sendable {
         case .dismiss: "dismiss"
         case .stats: "stats"
         case .synced: "synced"
+        case .cloudOff: "cloud-off"
         case .caution: "caution"
         case .problem: "problem"
         }
