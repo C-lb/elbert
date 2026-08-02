@@ -5,9 +5,15 @@ import XCTest
 /// seeded sample data, this one strings the whole path together against a deck that did not exist
 /// a moment ago, which is the thing a brand-new user actually does first.
 ///
-/// Launched clean, not with `-seedSampleData`: seeding is unrelated to what this walk is proving,
-/// and a from-scratch deck is unambiguous to find (`containing 'Smoke test deck'` cannot collide
-/// with anything the seed produces).
+/// Launched with `-resetStore`, not `-seedSampleData`: seeding is unrelated to what this walk is
+/// proving, and a from-scratch deck is what a brand-new user's first session looks like. Plain
+/// `app.launch()` is not "clean" here — XCUITest never resets the data container between test
+/// runs, only a launch argument the app itself acts on does, so without `-resetStore` this test
+/// would inherit whatever `DeckFlowUITests` (seeded decks) or an earlier run of this very test
+/// left behind. Two symptoms of skipping it, both seen in review: the global Study tab session
+/// would serve some other deck's cards first once one exists whose name sorts earlier, and a
+/// `deckRow` lookup that matches by `CONTAINS` could resolve a previous run's leftover
+/// "Smoke test deck" instead of the one this run just created.
 ///
 /// The note's term and definition are deliberately words that appear nowhere else in the app's
 /// chrome (not in the deck name, not in any screen title or button label), so a static-text
@@ -21,6 +27,7 @@ final class SmokeUITests: XCTestCase {
 
     func testCreateDeckAddNoteStudyAndRate() {
         let app = XCUIApplication()
+        app.launchArguments = ["-resetStore"]
         app.launch()
         // Not gated on the tab bar: the bar is up before the root screen has finished settling,
         // so this waits for the heading to actually read "Home" the way `testAppLaunches` does.
@@ -32,8 +39,17 @@ final class SmokeUITests: XCTestCase {
 
         selectTab(app, "Decks", heading: "Decks")
 
+        // With `-resetStore`, Decks starts genuinely empty, so — same reasoning as "New note"
+        // below — DeckListScreen shows "New deck" twice: once in the toolbar, once as the
+        // empty-state action. `app.buttons["New deck"]` alone is ambiguous until the first deck
+        // exists; `.firstMatch` is fine since both fire the same closure.
+        let newDeck = app.buttons.matching(NSPredicate(format: "label == 'New deck'")).firstMatch
         let field = app.textFields["Deck name"]
-        tap(app.buttons["New deck"], untilExists: field, "the naming alert never opened")
+        tap(newDeck, untilExists: field, "the naming alert never opened")
+        // No `.tap()` before typing here: a UIAlertController's text field auto-focuses when the
+        // alert presents, unlike the editor's fields below, which sit in an ordinary form and
+        // need an explicit tap to become first responder. Not an oversight — don't "fix" it to
+        // match the editor.
         field.typeText(deckName)
         // Writes once: this creates the deck, so it is a single tap and an assertion on the
         // result rather than the re-tapping helper.

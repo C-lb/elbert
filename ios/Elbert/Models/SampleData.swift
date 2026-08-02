@@ -14,6 +14,16 @@ import SwiftData
 enum SampleData {
     static let launchArgument = "-seedSampleData"
 
+    /// Empties the store on launch without seeding anything into it.
+    ///
+    /// XCUITest never resets the data container between tests — only `-seedSampleData` does that,
+    /// by resetting and then seeding. A walk that wants to prove something about content it
+    /// creates itself (rather than the samples) still needs a known-empty starting point, or it
+    /// silently inherits whatever an earlier test in the run left behind: leftover decks, and a
+    /// `NewCardCounter` allowance in `UserDefaults` that an earlier test already spent, which
+    /// changes which decks the Study queue serves first.
+    static let resetLaunchArgument = "-resetStore"
+
     private static let resourceName = "SampleDecks"
 
     // MARK: - Decoding
@@ -88,6 +98,30 @@ enum SampleData {
             // A broken sample file must not take the app down: the flag is a development
             // convenience, and failing loudly in the log is the right volume for it.
             print("Sample data failed to load: \(error)")
+            return false
+        }
+    }
+
+    /// Empties the store if `-resetStore` is present, and does nothing if `-seedSampleData` is
+    /// also present — that flag already resets on its own path, and running both would just
+    /// reset twice for no reason.
+    @MainActor
+    @discardableResult
+    static func resetIfRequested(
+        into context: ModelContext,
+        arguments: [String] = CommandLine.arguments,
+        counter: NewCardCounter = NewCardCounter()
+    ) -> Bool {
+        guard arguments.contains(resetLaunchArgument), !arguments.contains(launchArgument) else { return false }
+
+        do {
+            try reset(context)
+            counter.resetAll()
+            return true
+        } catch {
+            // Same volume as the sample-data failure above: a development convenience failing
+            // loudly in the log, not taking the app down.
+            print("Store reset failed: \(error)")
             return false
         }
     }

@@ -50,9 +50,11 @@ struct RootView: View {
         .safeAreaInset(edge: .bottom, spacing: 0) {
             HouseTabBar(selection: $selection)
         }
-        // Applied before `.housePalette()`, so the palette resolves off the overridden scheme
-        // rather than the system's, and `nil` (System) hands the environment's `\.colorScheme`
-        // straight through unchanged.
+        // `.preferredColorScheme` is a preference that propagates up to the window and gets
+        // re-published scene-wide through `\.colorScheme`; modifier order here does not change
+        // that mechanism. `nil` (System) hands the environment's `\.colorScheme` straight through
+        // unchanged, which is what lets `.housePalette()` resolve off the system scheme in that
+        // case and the overridden one otherwise.
         .preferredColorScheme(appearanceMode.colorScheme)
         .housePalette()
         .houseToast(toasts)
