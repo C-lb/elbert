@@ -50,6 +50,7 @@
 		B25ECF029DD73A9D914C4E1B /* HomeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CB5A836EFE25CC74E2DD333 /* HomeScreen.swift */; };
 		C2A070E5C88C230D281AE5B6 /* DelimitedImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E1FC5565DD622555E804B81E /* DelimitedImportTests.swift */; };
 		C4C7383C4B03DB00F4A1D1DE /* NoteDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D3F2529564B28F2C1D7E1D4 /* NoteDraft.swift */; };
+		CF86A6E911ECEDEA11F43920 /* DeckImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E264CB6A201FCF2D708A0DC /* DeckImportTests.swift */; };
 		CFFCDE69A2971100CB185F55 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA003E187A670B9A428A721 /* SettingsTests.swift */; };
 		D12A70BE444795F9E852DF22 /* SampleDecks.json in Resources */ = {isa = PBXBuildFile; fileRef = 95F8074CDCCDEB3A62DA5BA5 /* SampleDecks.json */; };
 		D4171AC8952D568BAF2A8B40 /* SmokeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6147F7B6E091108EF6E835F9 /* SmokeUITests.swift */; };
@@ -62,6 +63,7 @@
 		F06A953EFB203E48CEE0DD75 /* CardsFromNoteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D7A3C8E5504FD6E0572EB9E /* CardsFromNoteTests.swift */; };
 		F1946F9891A405669D9A51B3 /* CardsFromNote.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0FC0A25782553AC9D95297D /* CardsFromNote.swift */; };
 		F1A9A1F0E888A7390930AB4D /* Cloze.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01D3BF6DFC83464AE4483F8C /* Cloze.swift */; };
+		F3392616EE7223001E36AA26 /* DeckImport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43963623FE56D266B7D3442E /* DeckImport.swift */; };
 		F6CB384DEAB01060DFEFE6FF /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEF47AD555DC9FDFA26DA12 /* Theme.swift */; };
 		F74066CD6142ED8CA4510EC3 /* FSRSKit in Frameworks */ = {isa = PBXBuildFile; productRef = 022FB4FF06F68601E4A94F82 /* FSRSKit */; };
 /* End PBXBuildFile section */
@@ -102,8 +104,10 @@
 		2389E116B6171C4F8ABAD15E /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		25BF213188459A5C1BBB44AA /* ModelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelsTests.swift; sourceTree = "<group>"; };
 		29C353264175FB2BEECE4741 /* SyncStatusDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncStatusDisplay.swift; sourceTree = "<group>"; };
+		2E264CB6A201FCF2D708A0DC /* DeckImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckImportTests.swift; sourceTree = "<group>"; };
 		35EB6287CAD0D74B044F387B /* DeckListScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckListScreen.swift; sourceTree = "<group>"; };
 		38BA9DC845FD3DAF66AF7EFB /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
+		43963623FE56D266B7D3442E /* DeckImport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeckImport.swift; sourceTree = "<group>"; };
 		4718063620CAC621ECF122C3 /* SampleDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleDataTests.swift; sourceTree = "<group>"; };
 		50A3DF54D54AB16756504518 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		52E7A2E10B27330E83314BDB /* ElbertApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertApp.swift; sourceTree = "<group>"; };
@@ -167,6 +171,7 @@
 			children = (
 				1D7A3C8E5504FD6E0572EB9E /* CardsFromNoteTests.swift */,
 				BA967F1A12915216E9A8F350 /* ClozeTests.swift */,
+				2E264CB6A201FCF2D708A0DC /* DeckImportTests.swift */,
 				E1FC5565DD622555E804B81E /* DelimitedImportTests.swift */,
 				01D3BA4B2279B83860F1EB29 /* DesignSystemTests.swift */,
 				9EB9CB4EFA66E80658A32574 /* ElbertTests.swift */,
@@ -286,6 +291,7 @@
 				87B26974EF8AF821EF15AAB4 /* .gitkeep */,
 				D0FC0A25782553AC9D95297D /* CardsFromNote.swift */,
 				01D3BF6DFC83464AE4483F8C /* Cloze.swift */,
+				43963623FE56D266B7D3442E /* DeckImport.swift */,
 				2108283929F09F4FA2ABAD0A /* DelimitedImport.swift */,
 				E6B977B4BEAC451F6FC0C3B8 /* NewCardCounter.swift */,
 				8D3F2529564B28F2C1D7E1D4 /* NoteDraft.swift */,
@@ -473,6 +479,7 @@
 				F1946F9891A405669D9A51B3 /* CardsFromNote.swift in Sources */,
 				F1A9A1F0E888A7390930AB4D /* Cloze.swift in Sources */,
 				4175C333970EA3210273F9BC /* Deck.swift in Sources */,
+				F3392616EE7223001E36AA26 /* DeckImport.swift in Sources */,
 				59B025771C896AE2E16084E6 /* DeckListScreen.swift in Sources */,
 				D6670FD9A263668B12C70E05 /* DeckNotesScreen.swift in Sources */,
 				710D31C839611FEC5ED15D31 /* DeckSettingsScreen.swift in Sources */,
@@ -511,6 +518,7 @@
 			files = (
 				F06A953EFB203E48CEE0DD75 /* CardsFromNoteTests.swift in Sources */,
 				06CDFF04BE3EC9527E2ED890 /* ClozeTests.swift in Sources */,
+				CF86A6E911ECEDEA11F43920 /* DeckImportTests.swift in Sources */,
 				C2A070E5C88C230D281AE5B6 /* DelimitedImportTests.swift in Sources */,
 				52C6A768F5F82AB1A1C54F90 /* DesignSystemTests.swift in Sources */,
 				9BA0567FE4B51D45DC38D210 /* ElbertTests.swift in Sources */,
