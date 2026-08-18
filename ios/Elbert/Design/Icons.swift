@@ -26,6 +26,9 @@ enum Icon: String, CaseIterable, Sendable {
     case caution = "exclamationmark.triangle"
     /// Semantic, for an error notice.
     case problem = "exclamationmark.octagon"
+    /// Bringing outside content in. Points down and into a tray, the platform's own direction for
+    /// an import, and deliberately not the up-arrow share glyph, which reads as sending out.
+    case importDeck = "square.and.arrow.down"
 
     /// The outline symbol, used at rest.
     var symbol: String { rawValue }
@@ -67,6 +70,7 @@ enum Icon: String, CaseIterable, Sendable {
         case .cloudOff: "cloud-off"
         case .caution: "caution"
         case .problem: "problem"
+        case .importDeck: "import-deck"
         }
     }
 }

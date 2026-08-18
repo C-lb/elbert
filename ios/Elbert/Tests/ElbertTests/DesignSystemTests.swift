@@ -166,6 +166,12 @@ struct IconTests {
         }
     }
 
+    @Test("the import icon has a symbol and a stable accessibility name")
+    func importIcon() {
+        #expect(Icon.importDeck.symbol == "square.and.arrow.down")
+        #expect(Icon.importDeck.name == "import-deck")
+    }
+
     @Test("every icon resolves to a real SF Symbol")
     func symbolsExist() {
         for icon in Icon.allCases {

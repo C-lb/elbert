@@ -20,6 +20,11 @@ struct HouseScreen<Content: View>: View {
     /// One optional primary action per screen, top right. This is the only place an accent fill is
     /// allowed to appear on a screen's chrome.
     var action: Action?
+
+    /// An optional second action, sitting to the left of the primary. Deliberately `.icon` tier
+    /// and never accent: a screen with two accent fills has no primary action, it has two buttons.
+    var secondary: Action?
+
     @ViewBuilder var content: Content
 
     struct Action {
@@ -56,6 +61,16 @@ struct HouseScreen<Content: View>: View {
                 .accessibilityAddTraits(.isHeader)
 
             Spacer(minLength: Space.s3)
+
+            // Declared after `action` but drawn before it, because the primary belongs furthest
+            // right where the thumb lands. The property order only affects the initialiser.
+            if let secondary {
+                Button(action: secondary.perform) {
+                    HouseIcon(icon: secondary.icon, role: .body)
+                }
+                .buttonStyle(HouseButtonStyle(tier: .icon, size: .small))
+                .accessibilityLabel(secondary.label)
+            }
 
             if let action {
                 Button(action: action.perform) {
