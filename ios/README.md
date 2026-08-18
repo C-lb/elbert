@@ -77,3 +77,30 @@ meaningful automated substitute for that.
 - **Deleting a deck cascades to its notes but promotes its subdecks.** Deck deletion has no
   undo, and taking a whole subtree with it is not something a confirmation dialog really warns
   about.
+
+## Importing decks
+
+Deck list, the icon left of New deck. Paste tab, comma or semicolon separated text, or pick a
+`.csv`, `.tsv` or `.txt` file from Files.
+
+`Engine/DelimitedImport.swift` is a port of the web app's `src/import/csv.ts`, and that file's
+tests are the oracle, so a change to one belongs in both. The port walks unicode scalars rather
+than characters on purpose: Swift clusters CRLF into a single `Character`, so a character-wise
+walk matches neither `\r` nor `\n` and swallows the line break into the field. The oracle's CRLF
+case is what caught it.
+
+`Engine/DeckImport.swift` writes each row through `CardsFromNote.reconcile`, the same path
+`EditorSheet.save()` uses, so imported cards arrive new like hand-written ones. It does not call
+`context.save()`; the caller owns the transaction.
+
+The parser does not detect header rows on purpose. The sheet's "Skip the first row" toggle makes
+it the person's call, because a heuristic eventually eats a real first card.
+
+`.apkg` is not supported on iOS. The web reader needs a zip library and SQLite, neither of which
+is in the iOS bundle.
+
+**UI test note.** Tapping a text field and typing into it needs `focus(_:in:_:)` from
+`UITestSupport.swift`, not a bare `tap()`. A single tap is dispatched and silently not honoured
+often enough to matter, and the failure surfaces minutes later as "Neither element nor any
+descendant has keyboard focus" on the `typeText` after it.
+

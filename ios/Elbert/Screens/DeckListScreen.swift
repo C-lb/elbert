@@ -14,6 +14,7 @@ struct DeckListScreen: View {
 
     @State private var editor: DeckNameEditor?
     @State private var deckPendingDeletion: Deck?
+    @State private var showingImport = false
 
     private var counts: [UUID: Queue.Counts] {
         Queue.counts(decks: decks, cards: Queue.eligible(cards: cards))
@@ -22,7 +23,8 @@ struct DeckListScreen: View {
     var body: some View {
         HouseScreen(
             title: "Decks",
-            action: .init(icon: .add, label: "New deck") { editor = .creating }
+            action: .init(icon: .add, label: "New deck") { editor = .creating },
+            secondary: .init(icon: .importDeck, label: "Import") { showingImport = true }
         ) {
             if decks.isEmpty {
                 HouseEmptyState(
@@ -77,6 +79,9 @@ struct DeckListScreen: View {
             Button("Keep it", role: .cancel) {}
         } message: { deck in
             Text(deletionWarning(for: deck))
+        }
+        .sheet(isPresented: $showingImport) {
+            ImportSheet()
         }
     }
 

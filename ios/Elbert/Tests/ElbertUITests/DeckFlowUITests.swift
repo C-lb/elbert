@@ -281,4 +281,44 @@ final class DeckFlowUITests: XCTestCase {
         )
         XCTAssertTrue(app.buttons["Study"].isSelected)
     }
+
+    // MARK: - Import
+
+    /// Pastes two rows into a brand new deck and proves they became cards.
+    ///
+    /// Launches with `-resetStore` rather than `-seedSampleData`, because this walk asserts on a
+    /// deck's own counts and the sample decks would make that assertion depend on the fixture.
+    func testPastedRowsImportIntoANewDeck() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-resetStore"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 15))
+        selectTab(app, "Decks", heading: "Decks")
+
+        // The toolbar button and the sheet's title share the word "Import", which is exactly the
+        // two-elements-one-name trap. The button is a button, the title is static text.
+        tap(app.buttons["Import"], untilExists: app.staticTexts["Import"], "open the import sheet")
+
+        // A vertical `TextField` surfaces as a text field on some runs and a text view on others,
+        // depending on whether it has grown past one line yet, so match on the identifier alone
+        // rather than betting on the element type.
+        let paste = app.descendants(matching: .any).matching(identifier: "import-paste").firstMatch
+        XCTAssertTrue(paste.waitForExistence(timeout: 5), "the paste field never appeared")
+        focus(paste, in: app, "the paste field")
+        paste.typeText("chat\tcat\nchien\tdog")
+
+        let name = app.textFields["import-new-deck"]
+        XCTAssertTrue(name.waitForExistence(timeout: 5))
+        focus(name, in: app, "the new deck field")
+        name.typeText("French")
+
+        // A writing tap is never re-tapped: a second one here would import twice.
+        app.buttons["import-confirm"].tap()
+
+        let row = app.buttons.containing(NSPredicate(format: "label CONTAINS 'French'")).firstMatch
+        XCTAssertTrue(row.waitForExistence(timeout: 10), "the imported deck never appeared")
+        XCTAssertTrue(row.label.contains("2 new"), "expected two new cards, got \(row.label)")
+    }
 }
+

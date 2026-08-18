@@ -13,6 +13,7 @@
 		0F368ED4194D9D3F395012BA /* StudySessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A6EE6DD8B368CACDA3D39EE /* StudySessionTests.swift */; };
 		1214A497C7D1842FC7215061 /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BA9DC845FD3DAF66AF7EFB /* AppTab.swift */; };
 		1400FBC825F50AE163F03BF1 /* ModelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BF213188459A5C1BBB44AA /* ModelsTests.swift */; };
+		141434D4C7CA78127E420029 /* ImportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD9FE63A59E45EB738931E9 /* ImportSheet.swift */; };
 		1D9A490A881552337C9F124A /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A332AEF634FF9758F7A5DF20 /* Buttons.swift */; };
 		1E17230648BEBB6015A4D177 /* UITestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEE9B4E0D4700D75DA22AF35 /* UITestSupport.swift */; };
 		27277E369170503A8FA823BA /* SchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7E93B21999F54CBF01FCA7D /* SchedulerTests.swift */; };
@@ -147,6 +148,7 @@
 		D46B9879756CC394EBCCEF1C /* ElbertTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = ElbertTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B715D527791D66B8B78C6 /* ElbertUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElbertUITests.swift; sourceTree = "<group>"; };
 		D574077B80F4101BBADF7F4A /* Persistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Persistence.swift; sourceTree = "<group>"; };
+		DAD9FE63A59E45EB738931E9 /* ImportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSheet.swift; sourceTree = "<group>"; };
 		E1FC5565DD622555E804B81E /* DelimitedImportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimitedImportTests.swift; sourceTree = "<group>"; };
 		E6B977B4BEAC451F6FC0C3B8 /* NewCardCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewCardCounter.swift; sourceTree = "<group>"; };
 		E7C389F69D8800A969A18FEF /* Elbert.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Elbert.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -208,6 +210,7 @@
 				8CB5A836EFE25CC74E2DD333 /* HomeScreen.swift */,
 				0C098ED950F5833D92667649 /* HouseScreen.swift */,
 				87F896AF891F39904CB842B8 /* HouseTabBar.swift */,
+				DAD9FE63A59E45EB738931E9 /* ImportSheet.swift */,
 				1BF4C020B737128702A1A9C5 /* RootView.swift */,
 				721983C13B318479BCDA23A4 /* SettingsScreen.swift */,
 				8075B1F1A7C3D3A67312187D /* StudyScreen.swift */,
@@ -493,6 +496,7 @@
 				2DCEE9BB512778B4CF30AE11 /* HouseScreen.swift in Sources */,
 				9062FF5CFBFF44F8C706B09C /* HouseTabBar.swift in Sources */,
 				567703E5CF0B7C1371CB2E9C /* Icons.swift in Sources */,
+				141434D4C7CA78127E420029 /* ImportSheet.swift in Sources */,
 				69C20D6616E2BE848262F730 /* MediaAsset.swift in Sources */,
 				71C10A1B970BFD08DCAFC63A /* NewCardCounter.swift in Sources */,
 				7A03126B46C15805D2D918F7 /* Note.swift in Sources */,

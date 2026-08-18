@@ -63,4 +63,25 @@ extension XCTestCase {
             line: line
         )
     }
+
+
+    /// Taps a text field until it actually holds the keyboard, then leaves it focused.
+    ///
+    /// A single tap on a field is found, dispatched, and silently not honoured often enough to
+    /// matter: the field never takes focus and the `typeText` after it fails with "Neither element
+    /// nor any descendant has keyboard focus", several minutes later. Unlike a writing tap this one
+    /// is safe to repeat, because focusing an already-focused field does nothing.
+    func focus(
+        _ element: XCUIElement,
+        in app: XCUIApplication,
+        _ what: String,
+        file: StaticString = #filePath,
+        line: UInt = #line
+    ) {
+        for attempt in 1...3 {
+            element.tap()
+            if app.keyboards.element.waitForExistence(timeout: attempt == 1 ? 5 : 10) { return }
+        }
+        XCTFail("\(what) never took keyboard focus", file: file, line: line)
+    }
 }
